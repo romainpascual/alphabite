@@ -33,4 +33,4 @@ def alphabeta(node=0, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), bet
 
 #Pour lancer le alphabeta sur un arbre il faut lancer la fonction
 
-minimax(0, 0, true, -INFINITY, +INFINITY)
+minimax(0, 0, true, -float('inf'), float('inf'))
