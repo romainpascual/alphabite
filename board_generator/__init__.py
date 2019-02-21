@@ -1,6 +1,6 @@
 import scipy.misc.comb as comb # k parmi n
 
-from move_generator import MoveGenerator
+from .move_generator import MoveGenerator
 
 class BoardGenerator:
     def __init__(self, src_board):
@@ -75,7 +75,7 @@ class BoardGenerator:
         new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
         new_dest_cell = Cell(dest_cell_x, dest_cell_y, src_cell_species, dest_cell_group_size + moving_group_size)
 
-        new_board = src_board.set_cell(new_src_cell)
+        new_board = self.__src_board.set_cell(new_src_cell)
         new_board = new_board.set_cell(new_dest_cell)
 
         return (new_board, 1) # (Board, probability)
@@ -84,7 +84,7 @@ class BoardGenerator:
         new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
         new_dest_cell = Cell(dest_cell_x, dest_cell_y, src_cell_species, moving_group_size)
 
-        new_board = src_board.set_cell(new_src_cell)
+        new_board = self.__src_board.set_cell(new_src_cell)
         new_board = new_board.set_cell(new_dest_cell)
 
         return (new_board, 1) # (Board, probability)
@@ -93,7 +93,7 @@ class BoardGenerator:
         new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
         new_dest_cell = Cell(dest_cell_x, dest_cell_y, dest_cell_species, dest_cell_group_size)
 
-        new_board = src_board.set_cell(new_src_cell)
+        new_board = self.__src_board.set_cell(new_src_cell)
         new_board = new_board.set_cell(new_dest_cell)
 
         return (new_board, 1) # (Board, probability)
@@ -123,7 +123,7 @@ class BoardGenerator:
                 new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
                 new_dest_cell = Cell(dest_cell_x, dest_cell_y, src_cell_species, k)
 
-                new_board = src_board.set_cell(new_src_cell)
+                new_board = self.__src_board.set_cell(new_src_cell)
                 new_board = new_board.set_cell(new_dest_cell)
 
                 # We use the binomial law to compute the probability of surviving
@@ -134,7 +134,7 @@ class BoardGenerator:
                 new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
                 new_dest_cell = Cell(dest_cell_x, dest_cell_y, dest_cell_species, k)
 
-                new_board = src_board.set_cell(new_src_cell)
+                new_board = self.__src_board.set_cell(new_src_cell)
                 new_board = new_board.set_cell(new_dest_cell)
 
                 k_survivor_probability = comb(dest_cell_group_size, k) * ((1-P)**k) * ((P)**(dest_cell_group_size-k))
