@@ -6,15 +6,28 @@ Fourni un pseudo code et une explication extensive que j'ai utilisé pour ecrire
 """
 
 
-def alphabeta(node=0, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf')):
+def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
+    """
+    Parcours du graphe en alphabeta pour choisir le bestmove
+    :param board:
+    :param depth:
+    :param isMaximizingPlayer:
+    :param alpha:
+    :param beta:
+    :param max_depth:
+    :return: La best_val
+    """
 
-    if node.isterminal() is True:
-        return heuristic(node)
+    if board.isterminal() is True: #on arrete si on a gagner
+        return board.heuristic()
+
+    if depth == max_depth:
+        return board.heuristic()
 
     if isMaximizingPlayer:
         best_val = -float('inf')
-        for node in node.children():
-            value = alphabeta(node, depth + 1, False, alpha, beta)
+        for board in board.nextmoves():
+            value = alphabeta(board, depth + 1, False, alpha, beta, max_depth)
             best_val = max(best_val, value)
             alpha = max(alpha, best_val)
             if beta <= alpha:
@@ -23,8 +36,8 @@ def alphabeta(node=0, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), bet
 
     else:
         best_val = float('inf')
-        for node in node.children():
-            value = alphabeta(node, depth + 1, True, alpha, beta)
+        for board in board.nextmoves():
+            value = alphabeta(board, depth + 1, True, alpha, beta, max_depth)
             best_val = min(best_val, value)
             beta = min(beta, best_val)
             if beta <= alpha:
@@ -33,4 +46,7 @@ def alphabeta(node=0, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), bet
 
 #Pour lancer le alphabeta sur un arbre il faut lancer la fonction
 
-minimax(0, 0, true, -float('inf'), float('inf'))
+"""
+board.nextmove ++ """
+
+alphabeta(board_init, 0, True, -float('inf'), float('inf'))
