@@ -9,7 +9,7 @@ class MoveGenerator:
         possible_moves = [] # array of Move objects
         friend_cells = self.__board.get_friend_cells()
         for friend_cell in friend_cells:
-            possible_moves = possible_moves.concat(self.get_possible_move(friend_cell))
+            possible_moves = possible_moves + self.get_possible_move(friend_cell)
         return possible_moves
 
     def get_possible_move(self, src_cell):
