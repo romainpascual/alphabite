@@ -26,27 +26,34 @@ def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta
 
     if isMaximizingPlayer:
         best_val = -float('inf')
-        for board in board.nextmoves():
+        best_move=0
+        for (board, move) in board.nextmoves():
             value = alphabeta(board, depth + 1, False, alpha, beta, max_depth)
-            best_val = max(best_val, value)
+            if best_val < value:
+                best_val = value
+                best_move = move
             alpha = max(alpha, best_val)
             if beta <= alpha:
                 break
-        return best_val
+        return best_val, best_move
 
     else:
         best_val = float('inf')
-        for board in board.nextmoves():
+        best_move = 0
+        for (board, move) in board.nextmoves():
             value = alphabeta(board, depth + 1, True, alpha, beta, max_depth)
-            best_val = min(best_val, value)
+            if best_val < value:
+                best_val = value
+                best_move = move
+            #best_val = min(best_val, value)
             beta = min(beta, best_val)
             if beta <= alpha:
                 break
-        return best_val
+        return best_val, best_move
 
 #Pour lancer le alphabeta sur un arbre il faut lancer la fonction
 
 """
-board.nextmove ++ """
+board.nextmove ++ prendre en compte le timing"""
 
 alphabeta(board_init, 0, True, -float('inf'), float('inf'))
