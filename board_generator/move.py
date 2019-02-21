@@ -9,11 +9,11 @@ class Move:
         new_board = new_board.exec_move_dest(self.__dest_cell, self.__change)
         return new_board
 
-    def get_src_cell():
+    def get_src_cell(self):
         return self.__src_cell
 
-    def get_dest_cell():
+    def get_dest_cell(self):
         return self.__dest_cell
 
-    def get_change():
+    def get_change(self):
         return self.__change
