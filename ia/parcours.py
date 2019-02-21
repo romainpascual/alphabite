@@ -26,7 +26,7 @@ def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta
 
     if isMaximizingPlayer:
         best_val = -float('inf')
-        best_move=0
+        best_move = None
         for (board, move) in board.nextmoves():
             value = alphabeta(board, depth + 1, False, alpha, beta, max_depth)
             if best_val < value:
@@ -39,7 +39,7 @@ def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta
 
     else:
         best_val = float('inf')
-        best_move = 0
+        best_move = None
         for (board, move) in board.nextmoves():
             value = alphabeta(board, depth + 1, True, alpha, beta, max_depth)
             if best_val < value:
