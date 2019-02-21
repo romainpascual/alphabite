@@ -1,3 +1,5 @@
+import scipy.misc.comb as comb # k parmi n
+
 from move_generator import MoveGenerator
 
 class BoardGenerator:
@@ -31,60 +33,43 @@ class BoardGenerator:
         moving_group_size = change.get_value()
 
         if (dest_cell_group_size == 0):
+            # The dest cell is empty
+            # We simply move our guys
             new_board = self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
             return [new_board]
 
         if (dest_cell_species == src_cell_species):
+            # The dest cell contains some of our guys
+            # We simply move our guys
             new_board = self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
             return [new_board]
 
         if (dest_cell_species == 'h'):
             if (moving_group_size >= dest_cell_group_size):
+                # The dest cell contains humans not numerous to survive
+                # It looks as if it was initially filled with our guys
                 new_board = self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
                 return [new_board]
-
             else:
-                if (moving_group_size == dest_cell_group_size):
-                    P = 0.5
-                    # possible_boards.append([new_board_src_winning, P])
-                    # possible_boards.append([new_board_dest_winning, 1-P])
-                    return possible_boards
-                elif (moving_group_size < dest_cell_group_size):
-                    P = moving_group_size / (2 * dest_cell_group_size)
-                    # possible_boards.append([new_board_src_winning, P])
-                    # possible_boards.append([new_board_dest_winning, 1-P])
-                    return possible_boards
-                else:
-                    P = (moving_group_size / dest_cell_group_size) - 0.5
-                    # possible_boards.append([new_board_src_winning, P])
-                    # possible_boards.append([new_board_dest_winning, 1-P])
-                    return possible_boards
+                # The dest cell contains humans and they are numerous
+                # A random battle happens
+                return self.get_all_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
 
         if (src_cell_species != dest_cell_species):
             if (moving_group_size >= 1.5 * dest_cell_group_size):
+                # The dest cell contains enemies not numerous to survive
+                # It's a slaughter
                 new_board = self.get_full_win_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
                 return [new_board]
-
             elif (dest_cell_group_size >= 1.5 * moving_group_size):
+                # The dest cell contains a lot of enemies
+                # It's a full defeat
                 new_board = self.get_full_defeat_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
                 return [new_board]
-
             else:
-                if (moving_group_size == dest_cell_group_size):
-                    P = 0.5
-                    # possible_boards.append([new_board_src_winning, P])
-                    # possible_boards.append([new_board_dest_winning, 1-P])
-                    return possible_boards
-                elif (moving_group_size < dest_cell_group_size):
-                    P = moving_group_size / (2 * dest_cell_group_size)
-                    # possible_boards.append([new_board_src_winning, P])
-                    # possible_boards.append([new_board_dest_winning, 1-P])
-                    return possible_boards
-                else:
-                    P = (moving_group_size / dest_cell_group_size) - 0.5
-                    # possible_boards.append([new_board_src_winning, P])
-                    # possible_boards.append([new_board_dest_winning, 1-P])
-                    return possible_boards
+                # The dest cell contains enemies in a certain number
+                # A random battle happens
+                return self.get_all_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
 
     def get_simple_move_board(self, src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size):
         new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
@@ -112,3 +97,47 @@ class BoardGenerator:
         new_board = new_board.set_cell(new_dest_cell)
 
         return (new_board, 1) # (Board, probability)
+
+    def get_all_random_battle_boards(self, src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size):
+        new_boards_src_winning = None
+        new_boards_dest_winning = None
+        if (moving_group_size == dest_cell_group_size):
+            P = 0.5
+            new_boards_src_winning = self.get_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, True)
+            new_boards_dest_winning = self.get_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, False)
+        elif (moving_group_size < dest_cell_group_size):
+            P = moving_group_size / (2 * dest_cell_group_size)
+            new_boards_src_winning = self.get_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, True)
+            new_boards_dest_winning = self.get_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, False)
+        else:
+            P = (moving_group_size / dest_cell_group_size) - 0.5
+            new_boards_src_winning = self.get_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, True)
+            new_boards_dest_winning = self.get_random_battle_boards(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, False)
+        possible_boards = new_boards_src_winning + new_boards_dest_winning
+        return possible_boards
+
+    def get_random_battle_boards(self, src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size, P, attacker_is_winner):
+        possible_boards = [] # Array of Board objects associated with a probability
+        if (attacker_is_winner):
+            for k in range(src_cell_group_size + 1):
+                new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
+                new_dest_cell = Cell(dest_cell_x, dest_cell_y, src_cell_species, k)
+
+                new_board = src_board.set_cell(new_src_cell)
+                new_board = new_board.set_cell(new_dest_cell)
+
+                # We use the binomial law to compute the probability of surviving
+                k_survivor_probability = comb(src_cell_group_size, k) * (P**k) * ((1-P)**(src_cell_group_size-k))
+                possible_boards.append((new_board, P * k_survivor_probability))
+        else:
+            for k in range(dest_cell_group_size + 1):
+                new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
+                new_dest_cell = Cell(dest_cell_x, dest_cell_y, dest_cell_species, k)
+
+                new_board = src_board.set_cell(new_src_cell)
+                new_board = new_board.set_cell(new_dest_cell)
+
+                k_survivor_probability = comb(dest_cell_group_size, k) * ((1-P)**k) * ((P)**(dest_cell_group_size-k))
+                possible_boards.append((new_board, P * k_survivor_probability))
+
+        return possible_boards
