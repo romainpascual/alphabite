@@ -5,14 +5,14 @@ class MoveGenerator:
     def __init__(self, board):
         self.__board = board
 
-    def get_possible_moves(self):
+    def get_all_possible_moves(self):
         possible_moves = [] # array of Move objects
         friend_cells = self.__board.get_friend_cells()
         for friend_cell in friend_cells:
             possible_moves = possible_moves + self.get_possible_move(friend_cell)
         return possible_moves
 
-    def get_possible_move(self, src_cell):
+    def get_possible_moves(self, src_cell):
         possible_moves = []
         board_width = self.__board.get_width()
         board_height = self.__board.get_height()
