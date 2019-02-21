@@ -1,5 +1,5 @@
-from move import Move
-from change import Change
+from .move import Move
+from .change import Change
 
 class MoveGenerator:
     def __init__(self, board):
