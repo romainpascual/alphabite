@@ -13,12 +13,6 @@ class MoveGenerator:
         return possible_moves
 
     def get_possible_moves(self, src_cell):
-        possible_moves = []
-        board_width = self.__board.get_width()
-        board_height = self.__board.get_height()
-        x0 = src_cell.get_x()
-        y0 = src_cell.get_y()
-
         ###
         # IMPORTANT
         # For now we do not split our population
@@ -26,6 +20,15 @@ class MoveGenerator:
         # TODO? - Enable splitting moves
         ###
         change = Change(src_cell.get_value(), src_cell.get_species())
+
+        return self.get_possible_moves_with_change(src_cell, change)
+
+    def get_possible_moves_with_change(self, src_cell, change):
+        possible_moves = []
+        board_width = self.__board.get_width()
+        board_height = self.__board.get_height()
+        x0 = src_cell.get_x()
+        y0 = src_cell.get_y()
 
         if (x0 > 0): # Move left
             dest_cell = self.__board.get_cell((x0 - 1, y0))
