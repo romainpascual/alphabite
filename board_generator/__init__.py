@@ -1,13 +1,5 @@
-import operator as op
-from functools import reduce
-
 from .move_generator import MoveGenerator
-
-def comb(n, k): # Computes k parmi n
-    k = min(k, n-k)
-    numer = reduce(op.mul, range(n, n-k, -1), 1)
-    denom = reduce(op.mul, range(1, r+1), 1)
-    return numer / denom
+from .misc import comb
 
 class BoardGenerator:
     def __init__(self, src_board):
