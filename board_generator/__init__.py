@@ -14,8 +14,6 @@ class BoardGenerator:
         return possible_boards
 
     def get_possible_boards(self, move):
-        possible_boards = [] # Array of Board objects associated with a probability
-
         src_cell = move.get_src_cell() # Cell object
         src_cell_x = src_cell.get_x()
         src_cell_y = src_cell.get_y()
