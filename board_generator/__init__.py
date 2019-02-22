@@ -1,6 +1,13 @@
-import scipy.misc.comb as comb # k parmi n
+import operator as op
+from functools import reduce
 
 from .move_generator import MoveGenerator
+
+def comb(n, k): # Computes k parmi n
+    k = min(k, n-k)
+    numer = reduce(op.mul, range(n, n-k, -1), 1)
+    denom = reduce(op.mul, range(1, r+1), 1)
+    return numer / denom
 
 class BoardGenerator:
     def __init__(self, src_board):
@@ -11,7 +18,7 @@ class BoardGenerator:
         possible_boards = [] # Array of Board objects associated with a probability
         possible_moves = self.__move_generator.get_all_possible_moves()
         for possible_move in possible_moves:
-            possible_boards = possible_boards + self.get_possible_boards(possible_move)
+            possible_boards += self.get_possible_boards(possible_move)
         return possible_boards
 
     def get_possible_boards(self, move):
