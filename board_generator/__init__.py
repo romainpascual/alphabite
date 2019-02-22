@@ -34,21 +34,18 @@ class BoardGenerator:
         if (dest_cell_group_size == 0):
             # The dest cell is empty
             # We simply move our guys
-            new_board = self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
-            return [new_board]
+            return self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
 
         if (dest_cell_species == src_cell_species):
             # The dest cell contains some of our guys
             # We simply move our guys
-            new_board = self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
-            return [new_board]
+            return self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
 
         if (dest_cell_species == 'h'):
             if (moving_group_size >= dest_cell_group_size):
                 # The dest cell contains humans not numerous to survive
                 # It looks as if it was initially filled with our guys
-                new_board = self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
-                return [new_board]
+                return self.get_simple_move_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
             else:
                 # The dest cell contains humans and they are numerous
                 # A random battle happens
@@ -58,13 +55,11 @@ class BoardGenerator:
             if (moving_group_size >= 1.5 * dest_cell_group_size):
                 # The dest cell contains enemies not numerous to survive
                 # It's a slaughter
-                new_board = self.get_full_win_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
-                return [new_board]
+                return self.get_full_win_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
             elif (dest_cell_group_size >= 1.5 * moving_group_size):
                 # The dest cell contains a lot of enemies
                 # It's a full defeat
-                new_board = self.get_full_defeat_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
-                return [new_board]
+                return self.get_full_defeat_board(src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size)
             else:
                 # The dest cell contains enemies in a certain number
                 # A random battle happens
@@ -77,7 +72,7 @@ class BoardGenerator:
         new_board = self.__src_board.set_cell(new_src_cell)
         new_board = new_board.set_cell(new_dest_cell)
 
-        return (new_board, 1) # (Board, probability)
+        return [(new_board, 1)] # (Board, probability)
 
     def get_full_win_board(self, src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size):
         new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
@@ -86,7 +81,7 @@ class BoardGenerator:
         new_board = self.__src_board.set_cell(new_src_cell)
         new_board = new_board.set_cell(new_dest_cell)
 
-        return (new_board, 1) # (Board, probability)
+        return [(new_board, 1)] # (Board, probability)
 
     def get_full_defeat_board(self, src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size):
         new_src_cell = Cell(src_cell_x, src_cell_y, src_cell_species, src_cell_group_size - moving_group_size)
@@ -95,7 +90,7 @@ class BoardGenerator:
         new_board = self.__src_board.set_cell(new_src_cell)
         new_board = new_board.set_cell(new_dest_cell)
 
-        return (new_board, 1) # (Board, probability)
+        return [(new_board, 1)] # (Board, probability)
 
     def get_all_random_battle_boards(self, src_cell_x, src_cell_y, dest_cell_x, dest_cell_y, src_cell_group_size, dest_cell_group_size, moving_group_size):
         new_boards_src_winning = None
