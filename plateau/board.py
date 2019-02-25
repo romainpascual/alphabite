@@ -153,7 +153,7 @@ class Board( object ):
         """
         Using the home cell, find out which species we are
         """
-        self.__species = self.__mat[x][y].get_species()
+        self.__species = self.__mat[x][y].species()
     
     # END set_species
 
