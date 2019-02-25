@@ -8,7 +8,7 @@
 # @brief A tool for cell handling
 #
 
-class Board( object ):
+class Cell( object ):
 
     # ----------------------------------------------------------------------------
     # -- INITIALIZATION
