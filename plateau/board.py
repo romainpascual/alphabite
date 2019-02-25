@@ -4,6 +4,9 @@
 
 # -- Third-party modules
 
+# -- Program modules
+from cell import Cell
+
 ##
 # @brief A tool for board simulation
 #
@@ -34,7 +37,7 @@ class Board( object ):
         # Attributs
         self.__n = n
         self.__m = m
-        self.__mat = [[None for _ in range(self.__m)] for _ in range(self.__n)]
+        self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
 
         self.__species = None
 
@@ -117,14 +120,18 @@ class Board( object ):
 
     def update(self, upd):
         """
-        update the board according to upd=[(x, y, cell)]
+        update the board according to upd=[(x, y, (nb, species) )]
+        if nb=0, then specie= None
         """
         # -- Errors
         self.__err_code = Board.FAILURE
         self.__err_msg = "Board.update()"
 
         for up in upd:
-            self.__mat[up[0], up[1]] = up[[2]]
+            if up[[2]][0] != 0:
+                self.__mat[up[0], up[1]].update_cell(up)
+            else:
+                self.__mat[up[0], up[1]].update_cell((0,None))
 
         # -- Errors
         self.__err_code = Board.SUCCESS
