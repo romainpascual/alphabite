@@ -43,6 +43,19 @@ class Board( object ):
 
     # END def __init__
 
+    @staticmethod
+    def create_from_board(previous_board, cell_list):
+        """
+        Create a new board from a previous board and a given cell list to change
+        """
+        new_board = Board(previous_board.height(), previous_board.width())
+        new_board.__mat = previous_board.__mat
+        for cell in cell_list:
+            new_board.__mat[cell.get_x(), cell.get_y()] = cell
+        return new_board
+    
+    # END create_from_board
+
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------
