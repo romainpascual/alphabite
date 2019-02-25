@@ -44,9 +44,8 @@ class IA(Thread):
                 value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
-                    best_move = move
                     if depth == 0:
-                        self.__best_move = best_move
+                        self.__best_move = move
                 alpha = max(alpha, best_val)
                 if beta <= alpha:
                     break
@@ -58,9 +57,8 @@ class IA(Thread):
                 value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
-                    best_move = move
                     if depth == 0:
-                        self.__best_move = best_move
+                        self.__best_move = move
                 beta = min(beta, best_val)
                 if beta <= alpha:
                     break
