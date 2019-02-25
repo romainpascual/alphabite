@@ -120,8 +120,8 @@ class Board( object ):
 
     def update(self, upd):
         """
-        update the board according to upd=[(x, y, (nb, species) )]
-        if nb=0, then specie= None
+        Update the board according to upd=[(x, y, (nb, species) )]
+        If nb=0, then specie= None
         """
         # -- Errors
         self.__err_code = Board.FAILURE
