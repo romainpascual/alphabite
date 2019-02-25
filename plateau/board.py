@@ -58,7 +58,7 @@ class Board( object ):
         new_board = Board(previous_board.height(), previous_board.width())
         new_board.__mat = previous_board.__mat
         for cell in cell_list:
-            new_board.__mat[cell.get_x()][cell.get_y()] = cell
+            new_board.updateCell(cell)
         return new_board
     
     # END create_from_board
@@ -137,10 +137,8 @@ class Board( object ):
         self.__err_msg = "Board.update()"
 
         for up in upd:
-            if up[2][0] != 0:
-                self.__mat[up[0]][up[1]].update_cell(up)
-            else:
-                self.__mat[up[0]][up[1]].update_cell((0,None))
+            newCell = Cell(up[0], up[1], up[2][0], up[2][1])
+            self.updateCell(newCell)
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -148,6 +146,8 @@ class Board( object ):
 
     # END update
 
+    def updateCell(self, newCell):
+        self.__mat[newCell.x][newCell.y] = newCell
 
     def set_species(self, x, y):
         """
