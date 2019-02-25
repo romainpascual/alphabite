@@ -58,7 +58,8 @@ class Board( object ):
         new_board = Board(previous_board.height(), previous_board.width())
         new_board.__mat = previous_board.__mat
         for cell in cell_list:
-            new_board.updateCell(cell)
+            new_board.update_cell(cell)
+        new_board.upd_win()
         return new_board
     
     # END create_from_board
@@ -92,13 +93,13 @@ class Board( object ):
     
     # END height
 
-    def getCell(self, i, j):
+    def get_cell(self, i, j):
         """
         Return the content of the cell at position(i,j)
         """
         return self.__mat[i][j]
 
-    # END getCell
+    # END get_cell
 
     @property
     def h(self):
@@ -142,7 +143,9 @@ class Board( object ):
 
         for up in upd:
             newCell = Cell(up[0], up[1], up[2][0], up[2][1])
-            self.updateCell(newCell)
+            self.update_cell(newCell)
+        
+        self.upd_win()
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -167,15 +170,15 @@ class Board( object ):
     
     # END get_species
 
-    def updateCell(self, newCell):
-        oldCell = self.__mat[newCell.x][newCell.y]
-        self.updSpecies(oldCell.species, (-1)*oldCell.group_size)
-        self.__mat[newCell.x][newCell.y] = newCell
-        self.updSpecies(newCell.species, newCell.group_size)
+    def update_cell(self, new_cell):
+        old_cell = self.__mat[new_cell.x][new_cell.y]
+        self.upd_species(old_cell.species, (-1)*old_cell.group_size)
+        self.__mat[new_cell.x][new_cell.y] = new_cell
+        self.upd_species(new_cell.species, new_cell.group_size)
 
-    # END updateCell
+    # END update_cell
 
-    def updSpecies(self, species, number):
+    def upd_species(self, species, number):
         if species is None:
             pass
         elif species == 'w':
@@ -197,3 +200,15 @@ class Board( object ):
             return 0 # to match the IA requirements
     
     # END heuristic
+
+    def upd_win(self):
+        if self.__species == "w" and self.__w == 0:
+            self.__win = -1
+        elif self.__species == "v" and self.__v == 0:
+            self.__win = -1
+        elif self.__species == "w" and self.__v == 0:
+            self.__win = 1
+        elif self.__species == "v" and self.__w == 0:
+            self.__win = 1
+    
+    # END upd_win
