@@ -25,7 +25,7 @@ class Board( object ):
     def __init__(
             self,
             n=0,
-            m=0):
+            m=0,):
 
         # -- Errors
         self.__err_code = Board.FAILURE
@@ -35,7 +35,11 @@ class Board( object ):
         self.__n = n
         self.__m = m
         self.__mat = [[None for _ in range(self.__m)] for _ in range(self.__n)]
+
         self.__species = None
+
+        self.__vampires = 0
+        self.__werewolves = 0
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -90,6 +94,22 @@ class Board( object ):
         return self.__mat[i,j]
 
     # END getCell
+
+    def vampires(self):
+        """
+        Get population of vampire
+        """
+        return self.__vampires
+
+    # END vampires
+
+    def werewolves(self):
+        """
+        Get population of werewolves
+        """
+        return self.__werewolves
+
+    # END werewolves
 
     # ----------------------------------------------------------------------------
     # -- UPDATE
