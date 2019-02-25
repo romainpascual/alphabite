@@ -190,6 +190,8 @@ class Board:
         Using the home cell, find out which species we are
         """
         self.__species = self.__mat[x][y].species
+        for cell in self.__mat:
+            self.upd_friend_cells(cell)
     # END set_species
     
     def update_cell(self, new_cell):
