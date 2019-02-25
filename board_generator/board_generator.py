@@ -1,4 +1,4 @@
-from ..board import Board, Cell
+from board import Board, Cell
 from .move_generator import MoveGenerator
 from .misc import comb
 
