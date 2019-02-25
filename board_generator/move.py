@@ -15,3 +15,11 @@ class Move:
     @property
     def change(self):
         return self.__change
+
+    def parse_for_socket(self):
+        x1 = self.__src_cell.x
+        y1 = self.__src_cell.y
+        x2 = self.__dest_cell.x
+        y2 = self.__dest_cell.y
+        moving_group_size = self.__change.value
+        return (x1, y1, moving_group_size, x2, y2)
