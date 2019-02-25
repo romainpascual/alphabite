@@ -153,7 +153,7 @@ class Board( object ):
         """
         Using the home cell, find out which species we are
         """
-        self.__species = self.__mat[x][y].species()
+        self.__species = self.__mat[x][y].species
     
     # END set_species
 
@@ -168,9 +168,20 @@ class Board( object ):
     def updSpecies(self, species, number):
         if(species == None):
             pass
-        elif(species == 'W'):
+        elif(species == 'w'):
             self.__w += number
-        elif(species == 'H'):
+        elif(species == 'h'):
             self.__h += number
-        elif (species == 'V'):
+        elif (species == 'v'):
             self.__v += number
+        
+    def heuristic(self):
+        """
+        return the heuristic value of the board
+        """
+        try:
+            return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
+        except ZeroDivisionError:
+            return 0 # to match the IA requirements
+    
+    # END heuristic
