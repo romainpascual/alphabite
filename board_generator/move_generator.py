@@ -9,7 +9,7 @@ class MoveGenerator:
     def get_all_possible_moves(self):
         # Return an array of move objects that the IA can possibly perform given the state of the board
         possible_moves = [] # array of Move objects
-        friend_cells = self.__board.get_friend_cells()
+        friend_cells = self.__board.friend_cells
         for friend_cell in friend_cells:
             possible_moves = possible_moves + self.get_possible_moves(friend_cell)
         return possible_moves
@@ -21,7 +21,7 @@ class MoveGenerator:
         # We only move the entire group contained in our cells
         # TODO? - Enable splitting moves
         ###
-        change = Change(src_cell.value, src_cell.species)
+        change = Change(src_cell.group_size, src_cell.species)
 
         return self.get_possible_moves_with_change(src_cell, change)
 
