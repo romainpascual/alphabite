@@ -1,1 +1,4 @@
 .idea/
+
+# Board Tests
+/board/*Test.py
