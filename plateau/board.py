@@ -5,7 +5,7 @@
 # -- Third-party modules
 
 # -- Program modules
-from cell import Cell
+from .cell import Cell
 
 ##
 # @brief A tool for board simulation
@@ -58,7 +58,7 @@ class Board( object ):
         new_board = Board(previous_board.height(), previous_board.width())
         new_board.__mat = previous_board.__mat
         for cell in cell_list:
-            new_board.__mat[cell.get_x(), cell.get_y()] = cell
+            new_board.__mat[cell.get_x()][cell.get_y()] = cell
         return new_board
     
     # END create_from_board
@@ -94,7 +94,7 @@ class Board( object ):
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__mat[i,j]
+        return self.__mat[i][j]
 
     # END getCell
 
@@ -129,8 +129,8 @@ class Board( object ):
 
     def update(self, upd):
         """
-        update the board according to upd=[(x, y, (nb, species) )]
-        if nb=0, then specie= None
+        Update the board according to upd=[(x, y, (nb, species) )]
+        If nb=0, then specie=None
         """
         # -- Errors
         self.__err_code = Board.FAILURE
@@ -138,9 +138,9 @@ class Board( object ):
 
         for up in upd:
             if up[[2]][0] != 0:
-                self.__mat[up[0], up[1]].update_cell(up)
+                self.__mat[up[0]][up[1]].update_cell(up)
             else:
-                self.__mat[up[0], up[1]].update_cell((0,None))
+                self.__mat[up[0]][up[1]].update_cell((0,None))
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -153,7 +153,7 @@ class Board( object ):
         """
         Using the home cell, find out which species we are
         """
-        self.__species = self.__mat[x,y].get_species()
+        self.__species = self.__mat[x][y].get_species()
     
     # END set_species
 
