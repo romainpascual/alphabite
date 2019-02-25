@@ -77,10 +77,3 @@ class IA(Thread):
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
-
-#Pour lancer le alphabeta sur un arbre il faut lancer la fonction
-
-"""
-prendre en compte le timing"""
-
-#alphabeta(board_init, 0, True, -float('inf'), float('inf'),max_depth)
