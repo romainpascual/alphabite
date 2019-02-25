@@ -8,10 +8,10 @@ class BoardGenerator:
         self.__move_generator = MoveGenerator(src_board)
 
     def get_all_possible_boards(self):
-        possible_boards = []  # Array of Board objects associated with a probability
+        possible_boards = []  # Array of tuples (Board objects associated with a probability, Move object)
         possible_moves = self.__move_generator.get_all_possible_moves()
         for possible_move in possible_moves:
-            possible_boards += self.get_possible_boards(possible_move)
+            possible_boards += (self.get_possible_boards(possible_move), possible_move)
         return possible_boards
 
     def get_possible_boards(self, move):
