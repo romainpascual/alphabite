@@ -1,8 +1,6 @@
 import socket
-from threading import Thread
+from threading import Thread, Event
 import struct
-
-commandes_calcul = [b'ADD', b'MIN', b'TIM', b'DIV']
 
 
 class SocketConnector(Thread):
@@ -18,6 +16,8 @@ class SocketConnector(Thread):
         self.__board_hme = None
         self.__board_map = None
         self.__board_upd = None
+
+        self.__sendEvent = Event()
 
     def set_methods(self, board_set, board_hme, board_map, board_upd):
         self.__board_set = board_set
@@ -121,36 +121,27 @@ class SocketConnector(Thread):
     def __handle_upd(self, upd):
         print("Map:", upd)
         self.__board_upd(upd)
+        self.__sendEvent.set()
         
-    def __send_mov(self, mov_list):
+    def send_mov(self, mov_list):
         """
         mov_list = [(x_origin_1, y_origin_1, nb_unit_1, x_dest_1, y_dest_1),
                     (x_origin_2, y_origin_2, nb_unit_2, x_dest_2, y_dest_2),
                     ...]
         """
+        self.__sendEvent.wait()
         n = len(mov_list)
         orders = []
         for mov in mov_list:
             orders += list(mov)
         print('Sending MOV:', mov_list)
         self.server_connection.send(struct.pack('3s B'+'BBBBB'*n, b'MOV', n, *orders))
+        self.__sendEvent.clear()
 
     def run(self):
         while self.active_connection:
-            try:
-                self.__get_upd()
-                self.__send_mov([(4, 3, 4, 3, 2)])
+            self.__get_upd()
 
-                self.__get_upd()
-                self.__send_mov([(3, 2, 4, 2, 2)])
-
-                self.__get_upd()
-                self.__send_mov([(2, 2, 8, 3, 1)])
-
-                self.__get_upd()
-                self.__send_mov([(3, 1, 8, 4, 1)])
-            except:
-                continue
         print('Ran.')
 
 
