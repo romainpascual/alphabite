@@ -127,6 +127,9 @@ class Board:
         """
         return self.__w
 
+    @property
+    def win(self):
+        return self.__win
     # END w
 
     # ----------------------------------------------------------------------------
