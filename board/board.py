@@ -11,7 +11,6 @@ from .cell import Cell
 # @brief A tool for board simulation
 #
 
-
 class Board:
     
     # ----------------------------------------------------------------------------
@@ -23,7 +22,7 @@ class Board:
     FAILURE = 1
 
     # ----------------------------------------------------------------------------
-    # -- INITIALIZATION
+    # -- DEFAULT FUNCTIONS
     # ----------------------------------------------------------------------------
 
     def __init__(
@@ -37,32 +36,47 @@ class Board:
         # Attributs
         self.__n = n
         self.__m = m
+        self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
+        self.__species = ""
         self.__h = 0
         self.__v = 0
         self.__w = 0
-        self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
-
-        self.__species = None
         self.__win = 0
+        self.__friend_cells = dict()
 
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
-
     # END def __init__
+
+    def __copy__(self):
+        """
+        The copy() method returns a shallow copy of the board
+        """
+        # Create a new instance
+        other_board = Board()
+
+        # Copy the attributes
+        other_board.__n = self.__n
+        other_board.__m = self.__m
+        other_board.__mat = self.__mat.copy()
+        other_board.__species = self.__species
+        other_board.__h = self.__h
+        other_board.__v = self.__v
+        other_board.__w = self.__w
+        other_board.__win = self.__win
+        other_board.__friend_cells = self.__friend_cells.copy()
 
     @staticmethod
     def create_from_board(previous_board, cell_list):
         """
         Create a new board from a previous board and a given cell list to change
         """
-        new_board = Board(previous_board.height(), previous_board.width())
-        new_board.__mat = previous_board.__mat
+        new_board = previous_board.copy()
         for cell in cell_list:
             new_board.update_cell(cell)
         new_board.upd_win()
         return new_board
-    
     # END create_from_board
 
     # ----------------------------------------------------------------------------
@@ -75,6 +89,7 @@ class Board:
         Can be used to reset the map.
         """
         self.__init__(n,m)
+    # END build
 
     @property
     def width(self):
@@ -82,7 +97,6 @@ class Board:
         Get width
         """
         return self.__m
-    
     # END width
 
     @property
@@ -91,7 +105,6 @@ class Board:
         Get height
         """
         return self.__n
-    
     # END height
 
     def get_cell(self, pos):
@@ -99,38 +112,54 @@ class Board:
         Return the content of the cell at position(i,j)
         """
         return self.__mat[pos[0]][pos[1]]
-
     # END get_cell
 
     @property
-    def h(self):
+    def humans(self):
         """
         Get population of human
         """
         return self.__h
-
-    # END h
+    # END humans
 
     @property
-    def v(self):
+    def vampires(self):
         """
         Get population of vampire
         """
         return self.__v
-
-    # END v
+    # END vampires
 
     @property
-    def w(self):
+    def werewolves(self):
         """
         Get population of werewolves
         """
         return self.__w
+    # END werewolves
 
     @property
     def win(self):
+        """
+        Return the winning status (1 if won, -1 if lost, 0 o.w.)
+        """
         return self.__win
-    # END w
+    # END win
+
+    @property
+    def species(self):
+        """
+        Return our species
+        """
+        return self.__species
+    # END species
+
+    @property
+    def friend_cells(self):
+        """
+        Return the cells of our specie as a list
+        """
+        return list(self.__friend_cells.values())
 
     # ----------------------------------------------------------------------------
     # -- UPDATE
@@ -154,7 +183,6 @@ class Board:
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
-
     # END update
 
     def set_species(self, x, y):
@@ -162,18 +190,8 @@ class Board:
         Using the home cell, find out which species we are
         """
         self.__species = self.__mat[x][y].species
-    
     # END set_species
-
-    @property
-    def species(self):
-        """
-        Return our species
-        """
-        return self.__species
     
-    # END get_species
-
     def update_cell(self, new_cell):
         """
         Update cell content
@@ -182,7 +200,7 @@ class Board:
         self.upd_species(old_cell.species, (-1)*old_cell.group_size)
         self.__mat[new_cell.x][new_cell.y] = new_cell
         self.upd_species(new_cell.species, new_cell.group_size)
-
+        self.upd_friend_cells(new_cell)
     # END update_cell
 
     def upd_species(self, species, number):
@@ -197,19 +215,7 @@ class Board:
             self.__h += number
         elif species == 'v':
             self.__v += number
-
     # END upd_species
-        
-    def heuristic(self):
-        """
-        Return the heuristic value of the board
-        """
-        try:
-            return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
-        except ZeroDivisionError:
-            return 0 # to match the IA requirements
-    
-    # END heuristic
 
     def upd_win(self):
         """
@@ -223,5 +229,28 @@ class Board:
             self.__win = 1
         elif self.__species == "v" and self.__w == 0:
             self.__win = 1
-    
     # END upd_win
+
+    def upd_friend_cells(self, cell):
+        """
+        Update the friendly cells
+        """
+        if cell.species == self.__species:
+            self.__friend_cells[(cell.x,cell.y)] = cell
+        else:
+            self.__friend_cells.pop((cell.x,cell.y))
+    # END upd_friend_cells
+
+    # ----------------------------------------------------------------------------
+    # -- PLAYS
+    # ----------------------------------------------------------------------------
+
+    def heuristic(self):
+        """
+        Return the heuristic value of the board
+        """
+        try:
+            return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
+        except ZeroDivisionError:
+            return 0 # to match the IA requirements 
+    # END heuristic
