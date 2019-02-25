@@ -26,11 +26,10 @@ class IA:
         :param max_depth:
         :return:
         """
-
-        if src_board.isterminal() == 1: #on arrete si on a gagner
+        if src_board.win == 1: #on arrete si on a gagner
             return float('inf'), None
 
-        if src_board.isterminal() == -1: #on arrete si on a perdu aussi
+        if src_board.win == -1: #on arrete si on a perdu aussi
             return -float('inf'), None
 
         if depth == max_depth:
