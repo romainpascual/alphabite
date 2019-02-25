@@ -30,8 +30,9 @@ class Board( object ):
             self,
             n=0,
             m=0,
-            race1=0,
-            race2=0):
+            h=0,
+            v=0,
+            w=0):
 
         # -- Errors
         self.__err_code = Board.FAILURE
@@ -41,8 +42,9 @@ class Board( object ):
         self.__n = n
         self.__m = m
         self.__mat = [[None for _ in range(self.__m)] for _ in range(self.__n)]
-        self.__race1 = race1
-        self.__race2 = race2
+        self.__h = h
+        self.__v = v
+        self.__w = w
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -85,21 +87,29 @@ class Board( object ):
 
     # END getCell
 
-    def race1(self):
+    def h(self):
         """
         Get height
         """
-        return self.__race1
+        return self.__h
 
-    # END race1
+    # END h
 
-    def race2(self):
+    def v(self):
         """
         Get height
         """
-        return self.__race1
+        return self.__v
 
-    # END race2
+    # END v
+
+    def w(self):
+        """
+        Get height
+        """
+        return self.__w
+
+    # END w
 
     # ----------------------------------------------------------------------------
     # -- UPDATE
@@ -121,3 +131,13 @@ class Board( object ):
         self.__err_msg = ""
 
     # END update
+
+    def updSpecies(self, species, number):
+        if(species == None):
+            pass
+        elif(species == 'W'):
+            self.__w += number
+        elif(species == 'H'):
+            self.__h += number
+        elif (species == 'V'):
+            self.__v += number
