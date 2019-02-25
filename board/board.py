@@ -74,21 +74,23 @@ class Board( object ):
         """
         self.__init__(n,m)
 
-    def width(self):
+    @property
+    def m(self):
         """
         Get width
         """
         return self.__m
     
-    # END width
+    # END m
 
-    def height(self):
+    @property
+    def n(self):
         """
         Get height
         """
         return self.__n
     
-    # END height
+    # END n
 
     def getCell(self, i, j):
         """
@@ -98,7 +100,7 @@ class Board( object ):
 
     # END getCell
 
-
+    @property
     def h(self):
         """
         Get population of human
@@ -107,6 +109,7 @@ class Board( object ):
 
     # END h
 
+    @property
     def v(self):
         """
         Get population of vampire
@@ -115,6 +118,7 @@ class Board( object ):
 
     # END v
 
+    @property
     def w(self):
         """
         Get population of werewolves
@@ -150,11 +154,12 @@ class Board( object ):
         """
         Using the home cell, find out which species we are
         """
-        self.__species = self.__mat[x][y].species()
+        self.__species = self.__mat[x][y].species
     
     # END set_species
 
-    def get_species(self):
+    @property
+    def species(self):
         """
         Return our species
         """
@@ -168,6 +173,8 @@ class Board( object ):
         self.__mat[newCell.x][newCell.y] = newCell
         self.updSpecies(newCell.species, newCell.group_size)
 
+    # END updateCell
+
     def updSpecies(self, species, number):
         if species is None:
             pass
@@ -177,3 +184,15 @@ class Board( object ):
             self.__h += number
         elif species == 'V':
             self.__v += number
+
+        
+    def heuristic(self):
+        """
+        return the heuristic value of the board
+        """
+        try:
+            return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
+        except ZeroDivisionError:
+            return 0 # to match the IA requirements
+    
+    # END heuristic
