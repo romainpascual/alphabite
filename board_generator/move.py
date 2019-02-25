@@ -4,16 +4,22 @@ class Move:
         self.__dest_cell = dest_cell # Cell object
         self.__change = change # Change object
 
-    def exec(self, board):
-        new_board = board.exec_move_src(self.__src_cell, self.__change)
-        new_board = new_board.exec_move_dest(self.__dest_cell, self.__change)
-        return new_board
-
-    def get_src_cell(self):
+    @property
+    def src_cell(self):
         return self.__src_cell
 
-    def get_dest_cell(self):
+    @property
+    def dest_cell(self):
         return self.__dest_cell
 
-    def get_change(self):
+    @property
+    def change(self):
         return self.__change
+
+    def parse_for_socket(self):
+        x1 = self.__src_cell.x
+        y1 = self.__src_cell.y
+        x2 = self.__dest_cell.x
+        y2 = self.__dest_cell.y
+        moving_group_size = self.__change.value
+        return (x1, y1, moving_group_size, x2, y2)
