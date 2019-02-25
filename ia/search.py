@@ -42,7 +42,7 @@ class IA(Thread):
             best_val = -float('inf')
             best_move = None
             for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
+                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)[0]
                 if best_val < value:
                     best_val = value
                     best_move = move
@@ -57,7 +57,7 @@ class IA(Thread):
             best_val = float('inf')
             best_move = None
             for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
+                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)[0]
                 if best_val < value:
                     best_val = value
                     best_move = move
