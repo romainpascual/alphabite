@@ -4,11 +4,6 @@ class Move:
         self.__dest_cell = dest_cell # Cell object
         self.__change = change # Change object
 
-    def exec(self, board):
-        new_board = board.exec_move_src(self.__src_cell, self.__change)
-        new_board = new_board.exec_move_dest(self.__dest_cell, self.__change)
-        return new_board
-
     @property
     def src_cell(self):
         return self.__src_cell
