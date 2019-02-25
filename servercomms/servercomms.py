@@ -6,12 +6,19 @@ commandes_calcul = [b'ADD', b'MIN', b'TIM', b'DIV']
 
 
 class SocketConnector(Thread):
-    def __init__(self, ip, port, name='AlphaBite'):
+    def __init__(self, ip, port):
         Thread.__init__(self)
         self.server_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_connection.connect((ip, port))
         print('Connected')
         self.active_connection = True
+
+        # Functions
+        self.board_set = None
+        self.board_map = None
+        self.board_upd = None
+
+    def launch_game(self, name='AlphaBite'):
         # Sending name
         self.server_connection.send(struct.pack('3s B 9s', b'NME', 9, name.encode()))
         print('Sent name')
@@ -46,7 +53,7 @@ class SocketConnector(Thread):
         response = self.server_connection.recv(2)
         n, m = struct.unpack('B B', response)
         assert cmd == b'SET'
-        self._handle_set(n, m)
+        self._handle_set(m, n)
         return False
 
     def _get_hum(self):
@@ -83,13 +90,13 @@ class SocketConnector(Thread):
             self._handle_upd(upd)
 
     @staticmethod
-    def _parse_species(h, v, l):
-        species = 'h' if h else 'v' if v else 'l'
-        return h or v or l, species
+    def _parse_species(h, v, w):
+        # print('TEST', h, v, w)
+        species = 'h' if h else 'v' if v else 'w' if w else None
+        return h or v or w, species
 
-    @staticmethod
-    def _handle_set(n, m):
-        print("Grid size : {}x{}".format(n, m))
+    def _handle_set(self, n, m):
+        self.board_set(n, m)
 
     @staticmethod
     def _handle_hum(houses):
@@ -99,13 +106,11 @@ class SocketConnector(Thread):
     def _handle_hme(x, y):
         print('Departing at coordinates: ({}, {})'.format(x, y))
 
-    @staticmethod
-    def _handle_map(map):
-        print("Map:", map)
+    def _handle_map(self, map):
+        self.board_map(map)
 
-    @staticmethod
-    def _handle_upd(map):
-        print("UPD:", map)
+    def _handle_upd(self, upd):
+        self.board_upd(upd)
         
     def _send_mov(self, mov_list):
         """
@@ -122,17 +127,20 @@ class SocketConnector(Thread):
 
     def run(self):
         while self.active_connection:
-            self._get_upd()
-            self._send_mov([(4, 3, 4, 3, 2)])
+            try:
+                self._get_upd()
+                self._send_mov([(4, 3, 4, 3, 2)])
 
-            self._get_upd()
-            self._send_mov([(3, 2, 4, 2, 2)])
+                self._get_upd()
+                self._send_mov([(3, 2, 4, 2, 2)])
 
-            self._get_upd()
-            self._send_mov([(2, 2, 8, 3, 1)])
+                self._get_upd()
+                self._send_mov([(2, 2, 8, 3, 1)])
 
-            self._get_upd()
-            self._send_mov([(3, 1, 8, 4, 1)])
+                self._get_upd()
+                self._send_mov([(3, 1, 8, 4, 1)])
+            except:
+                continue
         print('Ran.')
 
 
