@@ -19,6 +19,9 @@ class SocketConnector(Thread):
 
         self.__sendEvent = Event()
 
+        self.__homeX = None
+        self.__homeY = None
+
     def set_methods(self, board_set, board_hme, board_map, board_upd):
         self.__board_set = board_set
         self.__board_hme = board_hme
@@ -112,11 +115,13 @@ class SocketConnector(Thread):
 
     def __handle_hme(self, x, y):
         print('Departing at coordinates: ({}, {})'.format(x, y))
-        self.__board_hme(x, y)
+        self.__homeX = x
+        self.__homeY = y
 
     def __handle_map(self, map):
         print("Map:", map)
         self.__board_map(map)
+        self.__board_hme(self.__homeX, self.__homeY)
 
     def __handle_upd(self, upd):
         print("Map:", upd)
