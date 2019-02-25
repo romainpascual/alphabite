@@ -60,7 +60,7 @@ class BoardGenerator:
         new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
         new_dst_cell = Cell(dst_cell.x, dst_cell.y, src_cell.species, dst_cell.group_size + moving_group_size)
 
-        new_board = Board.create_from_board.(self.__src_board, [new_src_cell, new_dst_cell])
+        new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dst_cell])
 
         return [(new_board, 1)]  # (Board, probability)
 
@@ -68,7 +68,7 @@ class BoardGenerator:
         new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
         new_dst_cell = Cell(dst_cell.x, dst_cell.y, src_cell.species, moving_group_size)
 
-        new_board = Board.create_from_board.(self.__src_board, [new_src_cell, new_dst_cell])
+        new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dst_cell])
 
         return [(new_board, 1)]  # (Board, probability)
 
@@ -76,7 +76,7 @@ class BoardGenerator:
         new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
         new_dst_cell = Cell(dst_cell.x, dst_cell.y, dst_cell.species, dst_cell.group_size)
 
-        new_board = Board.create_from_board.(self.__src_board, [new_src_cell, new_dst_cell])
+        new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dst_cell])
 
         return [(new_board, 1)]  # (Board, probability)
 
@@ -102,7 +102,7 @@ class BoardGenerator:
                 new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
                 new_dst_cell = Cell(dst_cell.x, dst_cell.y, src_cell.species, k)
 
-                new_board = Board.create_from_board.(self.__src_board, [new_src_cell, new_dst_cell])
+                new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dst_cell])
 
                 # We use the binomial law to compute the probability of surviving
                 k_survivor_probability = \
@@ -114,7 +114,7 @@ class BoardGenerator:
                 new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
                 new_dst_cell = Cell(dst_cell.x, dst_cell.y, dst_cell.species, k)
 
-                new_board = Board.create_from_board.(self.__src_board, [new_src_cell, new_dst_cell])
+                new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dst_cell])
 
                 # We use the binomial law to compute the probability of surviving
                 k_survivor_probability = \
