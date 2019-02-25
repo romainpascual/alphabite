@@ -4,9 +4,9 @@
 Source : https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
 Fourni un pseudo code et une explication extensive que j'ai utilisé pour ecrire le code
 """
+from board_generator import BoardGenerator
 
-
-def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
+def alphabeta(src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
     """
     Parcours du graphe en alphabeta pour choisir le bestmove
     :param board:
@@ -17,17 +17,17 @@ def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta
     :param max_depth:
     :return: La best_val
     """
-
-    if board.isterminal() is True: #on arrete si on a gagner
-        return board.heuristic()
+    generator = BoardGenerator(src_board)
+    if src_board.isterminal() is True: #on arrete si on a gagner
+        return src_board.heuristic()
 
     if depth == max_depth:
-        return board.heuristic()
+        return src_board.heuristic()
 
     if isMaximizingPlayer:
         best_val = -float('inf')
         best_move = None
-        for (board, move) in board.nextmoves():
+        for (board, move) in generator.get_all_possible_boards():
             value = alphabeta(board, depth + 1, False, alpha, beta, max_depth)
             if best_val < value:
                 best_val = value
@@ -40,7 +40,7 @@ def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta
     else:
         best_val = float('inf')
         best_move = None
-        for (board, move) in board.nextmoves():
+        for (board, move) in generator.get_all_possible_boards():
             value = alphabeta(board, depth + 1, True, alpha, beta, max_depth)
             if best_val < value:
                 best_val = value
@@ -56,4 +56,4 @@ def alphabeta(board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta
 """
 board.nextmove ++ prendre en compte le timing"""
 
-alphabeta(board_init, 0, True, -float('inf'), float('inf'))
+#alphabeta(board_init, 0, True, -float('inf'), float('inf'))
