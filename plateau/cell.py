@@ -51,5 +51,9 @@ class Cell( object ):
         self.__group_size = group_size
     
     def update_cell(self, upd):
+        """
+        Update a cell using a tuple (nb, species)
+        If nb=0, then specie=None
+        """
         self.__group_size = upd[0]
         self.__species = upd[1]
