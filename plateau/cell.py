@@ -43,3 +43,13 @@ class Cell( object ):
     
     def set_y(self, y):
         self.__y = y
+    
+    def set_species(self, species):
+        self.__species = species
+    
+    def set_group_size(self, group_size):
+        self.__group_size = group_size
+    
+    def update_cell(self, upd):
+        self.__group_size = upd[0]
+        self.__species = upd[1]

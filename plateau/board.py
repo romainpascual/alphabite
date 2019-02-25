@@ -4,13 +4,12 @@
 
 # -- Third-party modules
 
+# -- Program modules
+from cell import Cell
+
 ##
 # @brief A tool for board simulation
 #
-
-"""
-
-"""
 
 class Board( object ):
     
@@ -29,11 +28,7 @@ class Board( object ):
     def __init__(
             self,
             n=0,
-            m=0,
-            h=0,
-            v=0,
-            w=0):
-
+            m=0):
         # -- Errors
         self.__err_code = Board.FAILURE
         self.__err_msg = "Board.init()"
@@ -41,16 +36,32 @@ class Board( object ):
         # Attributs
         self.__n = n
         self.__m = m
-        self.__mat = [[None for _ in range(self.__m)] for _ in range(self.__n)]
-        self.__h = h
-        self.__v = v
-        self.__w = w
+        self.__h = 0
+        self.__v = 0
+        self.__w = 0
+        self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
+
+        self.__species = None
+
 
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
 
     # END def __init__
+
+    @staticmethod
+    def create_from_board(previous_board, cell_list):
+        """
+        Create a new board from a previous board and a given cell list to change
+        """
+        new_board = Board(previous_board.height(), previous_board.width())
+        new_board.__mat = previous_board.__mat
+        for cell in cell_list:
+            new_board.__mat[cell.get_x(), cell.get_y()] = cell
+        return new_board
+    
+    # END create_from_board
 
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
@@ -81,15 +92,16 @@ class Board( object ):
 
     def getCell(self, i, j):
         """
-        return the content of the cell at position(i,j)
+        Return the content of the cell at position(i,j)
         """
         return self.__mat[i,j]
 
     # END getCell
 
+
     def h(self):
         """
-        Get height
+        Get population of human
         """
         return self.__h
 
@@ -97,7 +109,7 @@ class Board( object ):
 
     def v(self):
         """
-        Get height
+        Get population of vampire
         """
         return self.__v
 
@@ -105,7 +117,7 @@ class Board( object ):
 
     def w(self):
         """
-        Get height
+        Get population of werewolves
         """
         return self.__w
 
@@ -117,20 +129,41 @@ class Board( object ):
 
     def update(self, upd):
         """
-        update the board according to upd=[(x, y, cell)]
+        update the board according to upd=[(x, y, (nb, species) )]
+        if nb=0, then specie= None
         """
         # -- Errors
         self.__err_code = Board.FAILURE
         self.__err_msg = "Board.update()"
 
         for up in upd:
-            self.__mat[up[0], up[1]] = up[[2]]
+            if up[[2]][0] != 0:
+                self.__mat[up[0], up[1]].update_cell(up)
+            else:
+                self.__mat[up[0], up[1]].update_cell((0,None))
 
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
 
     # END update
+
+
+    def set_species(self, x, y):
+        """
+        Using the home cell, find out which species we are
+        """
+        self.__species = self.__mat[x,y].get_species()
+    
+    # END set_species
+
+    def get_species(self):
+        """
+        Return our species
+        """
+        return self.__species
+    
+    # END get_species
 
     def updSpecies(self, species, number):
         if(species == None):
