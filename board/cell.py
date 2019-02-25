@@ -8,7 +8,8 @@
 # @brief A tool for cell handling
 #
 
-class Cell( object ):
+
+class Cell:
 
     # ----------------------------------------------------------------------------
     # -- INITIALIZATION

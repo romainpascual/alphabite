@@ -11,7 +11,8 @@ from .cell import Cell
 # @brief A tool for board simulation
 #
 
-class Board( object ):
+
+class Board:
     
     # ----------------------------------------------------------------------------
     # -- CLASS ATTRIBUTES
