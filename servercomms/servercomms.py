@@ -28,6 +28,10 @@ class SocketConnector(Thread):
         self.__board_map = board_map
         self.__board_upd = board_upd
 
+    @property
+    def event(self):
+        return self.__sendEvent
+
     def launch_game(self, name='AlphaBite'):
         # Sending name
         self.server_connection.send(struct.pack('3s B 9s', b'NME', 9, name.encode()))

@@ -10,13 +10,15 @@ import time
 
 
 class IA(Thread):
-    def __init__(self, src_board, max_depth = 1):
+    def __init__(self, src_board, max_depth=2):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
         self.__generator = BoardGenerator(src_board)
         self.__send_mov = None
         self.__max_depth = max_depth
+
+        self.event = None  # TODO: better event handling to allow for calculation during opponent turn
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
@@ -41,8 +43,9 @@ class IA(Thread):
         if isMaximizingPlayer:
             best_val = -float('inf')
             best_move = None
-            for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
+            for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
+                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)[0]
                 if best_val < value:
                     best_val = value
                     best_move = move
@@ -56,8 +59,9 @@ class IA(Thread):
         else:
             best_val = float('inf')
             best_move = None
-            for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
+            for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
+                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)[0]
                 if best_val < value:
                     best_val = value
                     best_move = move
@@ -69,11 +73,12 @@ class IA(Thread):
             return best_val, best_move
 
     def run(self):
-        self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), self.__max_depth)
-        tic = time.time()
-        while time.time()-tic <= 2:
-            continue
-        self.__send_mov(self.__best_move.parse_for_socket())
+        while True:
+            self.event.wait()
+            tic = time.time()
+            self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), self.__max_depth,)
+            print("Sending after {:.3f}s".format(time.time()-tic))
+            self.__send_mov([self.__best_move.parse_for_socket()])
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func

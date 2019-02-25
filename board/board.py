@@ -6,6 +6,7 @@
 
 # -- Program modules
 from .cell import Cell
+from copy import copy
 
 ##
 # @brief A tool for board simulation
@@ -67,12 +68,14 @@ class Board:
         other_board.__win = self.__win
         other_board.__friend_cells = self.__friend_cells.copy()
 
+        return other_board
+
     @staticmethod
     def create_from_board(previous_board, cell_list):
         """
         Create a new board from a previous board and a given cell list to change
         """
-        new_board = previous_board.copy()
+        new_board = copy(previous_board)
         for cell in cell_list:
             new_board.update_cell(cell)
         new_board.upd_win()
@@ -190,8 +193,9 @@ class Board:
         Using the home cell, find out which species we are
         """
         self.__species = self.__mat[x][y].species
-        for cell in self.__mat:
-            self.upd_friend_cells(cell)
+        for row in self.__mat:
+            for cell in row:
+                self.upd_friend_cells(cell)
     # END set_species
     
     def update_cell(self, new_cell):
@@ -240,7 +244,7 @@ class Board:
         if cell.species == self.__species:
             self.__friend_cells[(cell.x,cell.y)] = cell
         else:
-            self.__friend_cells.pop((cell.x,cell.y))
+            self.__friend_cells.pop((cell.x,cell.y), None)
     # END upd_friend_cells
 
     # ----------------------------------------------------------------------------
