@@ -103,7 +103,7 @@ class SocketConnector(Thread):
     def __parse_species(h, v, w):
         # print('TEST', h, v, w)
         species = 'h' if h else 'v' if v else 'w' if w else None
-        return h or v or w, species
+        return species, h or v or w
 
     def __handle_set(self, n, m):
         print("Grid size : {}x{}".format(n, m))
