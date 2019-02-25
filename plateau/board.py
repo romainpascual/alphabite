@@ -137,7 +137,7 @@ class Board( object ):
         self.__err_msg = "Board.update()"
 
         for up in upd:
-            newCell = Cell(upd[0], upd[1], upd[2][0], upd[2][1])
+            newCell = Cell(up[0], up[1], up[2][0], up[2][1])
             self.updateCell(newCell)
 
         # -- Errors
