@@ -28,8 +28,7 @@ class Board( object ):
     def __init__(
             self,
             n=0,
-            m=0,):
-
+            m=0):
         # -- Errors
         self.__err_code = Board.FAILURE
         self.__err_msg = "Board.init()"
@@ -37,12 +36,13 @@ class Board( object ):
         # Attributs
         self.__n = n
         self.__m = m
+        self.__h = 0
+        self.__v = 0
+        self.__w = 0
         self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
 
         self.__species = None
 
-        self.__vampires = 0
-        self.__werewolves = 0
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -98,21 +98,30 @@ class Board( object ):
 
     # END getCell
 
-    def vampires(self):
+
+    def h(self):
+        """
+        Get population of human
+        """
+        return self.__h
+
+    # END h
+
+    def v(self):
         """
         Get population of vampire
         """
-        return self.__vampires
+        return self.__v
 
-    # END vampires
+    # END v
 
-    def werewolves(self):
+    def w(self):
         """
         Get population of werewolves
         """
-        return self.__werewolves
+        return self.__w
 
-    # END werewolves
+    # END w
 
     # ----------------------------------------------------------------------------
     # -- UPDATE
@@ -139,6 +148,7 @@ class Board( object ):
 
     # END update
 
+
     def set_species(self, x, y):
         """
         Using the home cell, find out which species we are
@@ -154,3 +164,13 @@ class Board( object ):
         return self.__species
     
     # END get_species
+
+    def updSpecies(self, species, number):
+        if(species == None):
+            pass
+        elif(species == 'W'):
+            self.__w += number
+        elif(species == 'H'):
+            self.__h += number
+        elif (species == 'V'):
+            self.__v += number
