@@ -2,3 +2,6 @@
 
 # Board Tests
 /board/*Test.py
+
+# Config file
+kit_de_tests/interface_graphique/VampiresVSWerewolvesGameServer.exe.config
