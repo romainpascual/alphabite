@@ -5,14 +5,18 @@ Source : https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-al
 Fourni un pseudo code et une explication extensive que j'ai utilisé pour ecrire le code
 """
 from board_generator import BoardGenerator
+from threading import Thread
 import time
 
 
-class IA:
-    def __init__(self, src_board, socket):
+class IA(Thread):
+    def __init__(self, src_board, max_depth = 1):
+        Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
         self.__generator = BoardGenerator(src_board)
+        self.__send_mov = None
+        self.__max_depth = max_depth
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
@@ -64,11 +68,11 @@ class IA:
                     break
             return best_val, best_move
 
-    def run(self, max_depth):
-        self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), max_depth)
-        # tic = time.time()
-        # while time.time()-tic <= 2:
-        #     continue
+    def run(self):
+        self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), self.__max_depth)
+        tic = time.time()
+        while time.time()-tic <= 2:
+            continue
         self.__send_mov(self.__best_move.parse_for_socket())
 
     def set_send_mov(self, send_mov_func):
