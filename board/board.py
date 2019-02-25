@@ -74,21 +74,23 @@ class Board( object ):
         """
         self.__init__(n,m)
 
-    def width(self):
+    @property
+    def m(self):
         """
         Get width
         """
         return self.__m
     
-    # END width
+    # END m
 
-    def height(self):
+    @property
+    def n(self):
         """
         Get height
         """
         return self.__n
     
-    # END height
+    # END n
 
     def getCell(self, i, j):
         """
@@ -98,7 +100,7 @@ class Board( object ):
 
     # END getCell
 
-
+    @property
     def h(self):
         """
         Get population of human
@@ -107,6 +109,7 @@ class Board( object ):
 
     # END h
 
+    @property
     def v(self):
         """
         Get population of vampire
@@ -115,6 +118,7 @@ class Board( object ):
 
     # END v
 
+    @property
     def w(self):
         """
         Get population of werewolves
@@ -148,6 +152,8 @@ class Board( object ):
 
     def updateCell(self, newCell):
         self.__mat[newCell.x][newCell.y] = newCell
+    
+    # END updateCell
 
     def set_species(self, x, y):
         """
@@ -157,7 +163,8 @@ class Board( object ):
     
     # END set_species
 
-    def get_species(self):
+    @property
+    def species(self):
         """
         Return our species
         """
@@ -174,6 +181,8 @@ class Board( object ):
             self.__h += number
         elif (species == 'v'):
             self.__v += number
+    
+    # END updSpecies
         
     def heuristic(self):
         """
