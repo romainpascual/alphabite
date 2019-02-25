@@ -135,7 +135,7 @@ class Board:
 
     def update(self, upd):
         """
-        Update the board according to upd=[(x, y, (nb, species))]
+        Update the board according to upd=[(x, y, (species, nb))]
         If nb=0, then specie=None
         """
         # -- Errors
