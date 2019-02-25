@@ -8,10 +8,6 @@
 # @brief A tool for board simulation
 #
 
-"""
-
-"""
-
 class Board( object ):
     
     # ----------------------------------------------------------------------------
@@ -39,6 +35,7 @@ class Board( object ):
         self.__n = n
         self.__m = m
         self.__mat = [[None for _ in range(self.__m)] for _ in range(self.__n)]
+        self.__species = None
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -75,7 +72,7 @@ class Board( object ):
 
     def getCell(self, i, j):
         """
-        return the content of the cell at position(i,j)
+        Return the content of the cell at position(i,j)
         """
         return self.__mat[i,j]
 
@@ -101,3 +98,19 @@ class Board( object ):
         self.__err_msg = ""
 
     # END update
+
+    def set_species(self, x, y):
+        """
+        Using the home cell, find out which species we are
+        """
+        self.__species = self.__mat[x,y].get_species()
+    
+    # END set_species
+
+    def get_species(self):
+        """
+        Return our species
+        """
+        return self.__species
+    
+    # END get_species
