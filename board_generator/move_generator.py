@@ -1,6 +1,7 @@
 from .move import Move
 from .change import Change
 
+
 class MoveGenerator:
     def __init__(self, board):
         self.__board = board
