@@ -1,8 +1,8 @@
 class Move:
     def __init__(self, src_cell, dest_cell, change):
-        self.__src_cell = src_cell # Cell object
-        self.__dest_cell = dest_cell # Cell object
-        self.__change = change # Change object
+        self.__src_cell = src_cell  # Cell object
+        self.__dest_cell = dest_cell  # Cell object
+        self.__change = change  # Change object
 
     @property
     def src_cell(self):
@@ -22,4 +22,4 @@ class Move:
         x2 = self.__dest_cell.x
         y2 = self.__dest_cell.y
         moving_group_size = self.__change.value
-        return (x1, y1, moving_group_size, x2, y2)
+        return x1, y1, moving_group_size, x2, y2
