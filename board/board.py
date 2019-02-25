@@ -81,7 +81,7 @@ class Board( object ):
         """
         return self.__m
     
-    # END m
+    # END width
 
     @property
     def height(self):
@@ -90,7 +90,7 @@ class Board( object ):
         """
         return self.__n
     
-    # END n
+    # END height
 
     def getCell(self, i, j):
         """
@@ -178,13 +178,14 @@ class Board( object ):
     def updSpecies(self, species, number):
         if species is None:
             pass
-        elif species == 'W':
+        elif species == 'w':
             self.__w += number
-        elif species == 'H':
+        elif species == 'h':
             self.__h += number
-        elif species == 'V':
+        elif species == 'v':
             self.__v += number
 
+    # END updSpecies
         
     def heuristic(self):
         """
