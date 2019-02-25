@@ -150,11 +150,6 @@ class Board( object ):
 
     # END update
 
-    def updateCell(self, newCell):
-        self.__mat[newCell.x][newCell.y] = newCell
-    
-    # END updateCell
-
     def set_species(self, x, y):
         """
         Using the home cell, find out which species we are
@@ -172,17 +167,24 @@ class Board( object ):
     
     # END get_species
 
+    def updateCell(self, newCell):
+        oldCell = self.__mat[newCell.x][newCell.y]
+        self.updSpecies(oldCell.species, (-1)*oldCell.group_size)
+        self.__mat[newCell.x][newCell.y] = newCell
+        self.updSpecies(newCell.species, newCell.group_size)
+
+    # END updateCell
+
     def updSpecies(self, species, number):
-        if(species == None):
+        if species is None:
             pass
-        elif(species == 'w'):
+        elif species == 'W':
             self.__w += number
-        elif(species == 'h'):
+        elif species == 'H':
             self.__h += number
-        elif (species == 'v'):
+        elif species == 'V':
             self.__v += number
-    
-    # END updSpecies
+
         
     def heuristic(self):
         """
