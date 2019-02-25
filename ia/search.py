@@ -30,19 +30,18 @@ class IA(Thread):
         :return:
         """
         if src_board.win == 1: #on arrête si on a gagné
-            return float('inf'), None
+            return float('inf')
 
         if src_board.win == -1: #on arrête si on a perdu aussi
-            return -float('inf'), None
+            return -float('inf')
 
         if depth == max_depth:
-            return src_board.heuristic(), None
+            return src_board.heuristic()
 
         if isMaximizingPlayer:
             best_val = -float('inf')
-            best_move = None
             for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)[0]
+                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
                     best_move = move
@@ -51,13 +50,12 @@ class IA(Thread):
                 alpha = max(alpha, best_val)
                 if beta <= alpha:
                     break
-            return best_val, best_move
+            return best_val
 
         else:
             best_val = float('inf')
-            best_move = None
             for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)[0]
+                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
                     best_move = move
@@ -66,7 +64,7 @@ class IA(Thread):
                 beta = min(beta, best_val)
                 if beta <= alpha:
                     break
-            return best_val, best_move
+            return best_val
 
     def run(self):
         self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), self.__max_depth)
