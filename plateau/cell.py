@@ -26,30 +26,42 @@ class Cell( object ):
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------
 
-    def get_x(self):
+    @property
+    def x(self):
         return self.__x
-    
-    def get_y(self):
-        return self.__y
-    
-    def get_species(self):
-        return self.__species
 
-    def get_group_size(self):
-        return self.__group_size 
-    
-    def set_x(self, x):
+    @x.setter
+    def x(self, x):
         self.__x = x
     
-    def set_y(self, y):
-        self.__y = y
+    @property
+    def y(self):
+        return self.__y
     
-    def set_species(self, species):
+    @y.setter
+    def y(self, y):
+        self.__y = y
+
+    @property
+    def species(self):
+        return self.__species
+    
+    @species.setter
+    def species(self, species):
         self.__species = species
     
-    def set_group_size(self, group_size):
+    @property
+    def group_size(self):
+        return self.__group_size
+    
+    @group_size.setter
+    def group_size(self, group_size):
         self.__group_size = group_size
     
+    # ----------------------------------------------------------------------------
+    # -- BASIC FUNCTIONS
+    # ----------------------------------------------------------------------------
+
     def update_cell(self, upd):
         """
         Update a cell using a tuple (nb, species)

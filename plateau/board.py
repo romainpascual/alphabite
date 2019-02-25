@@ -120,7 +120,7 @@ class Board( object ):
 
     def update(self, upd):
         """
-        Update the board according to upd=[(x, y, (nb, species) )]
+        Update the board according to upd=[(x, y, (nb, species))]
         If nb=0, then specie=None
         """
         # -- Errors
@@ -128,7 +128,7 @@ class Board( object ):
         self.__err_msg = "Board.update()"
 
         for up in upd:
-            if up[[2]][0] != 0:
+            if up[2][0] != 0:
                 self.__mat[up[0]][up[1]].update_cell(up)
             else:
                 self.__mat[up[0]][up[1]].update_cell((0,None))
