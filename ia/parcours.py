@@ -13,7 +13,6 @@ class IA:
         self.__src_board = src_board
         self.__best_move = None
         self.__generator = BoardGenerator(src_board)
-        self.__socket = socket
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
@@ -26,10 +25,10 @@ class IA:
         :param max_depth:
         :return:
         """
-        if src_board.win == 1: #on arrete si on a gagner
+        if src_board.win == 1: #on arrête si on a gagné
             return float('inf'), None
 
-        if src_board.win == -1: #on arrete si on a perdu aussi
+        if src_board.win == -1: #on arrête si on a perdu aussi
             return -float('inf'), None
 
         if depth == max_depth:
@@ -70,7 +69,10 @@ class IA:
         # tic = time.time()
         # while time.time()-tic <= 2:
         #     continue
-        self.__socket.send_mov(self.__best_move.parse_for_socket())
+        self.__send_mov(self.__best_move.parse_for_socket())
+
+    def set_send_mov(self, send_mov_func):
+        self.__send_mov = send_mov_func
 
 #Pour lancer le alphabeta sur un arbre il faut lancer la fonction
 
