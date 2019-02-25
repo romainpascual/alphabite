@@ -32,39 +32,45 @@ class IA(Thread):
         :return:
         """
         if src_board.win == 1: #on arrête si on a gagné
-            return float('inf')
+            return float('inf'), None
 
         if src_board.win == -1: #on arrête si on a perdu aussi
-            return -float('inf')
+            return -float('inf'), None
 
         if depth == max_depth:
-            return src_board.heuristic()
+            return src_board.heuristic(), None
 
         if isMaximizingPlayer:
             best_val = -float('inf')
-            for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
+            best_move = None
+            for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
+                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)[0]
                 if best_val < value:
                     best_val = value
+                    best_move = move
                     if depth == 0:
-                        self.__best_move = move
+                        self.__best_move = best_move
                 alpha = max(alpha, best_val)
                 if beta <= alpha:
                     break
-            return best_val
+            return best_val, best_move
 
         else:
             best_val = float('inf')
-            for (board, move) in self.__generator.get_all_possible_boards():
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
+            best_move = None
+            for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
+                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)[0]
                 if best_val < value:
                     best_val = value
+                    best_move = move
                     if depth == 0:
-                        self.__best_move = move
+                        self.__best_move = best_move
                 beta = min(beta, best_val)
                 if beta <= alpha:
                     break
-            return best_val
+            return best_val, best_move
 
     def run(self):
         while True:
@@ -76,3 +82,10 @@ class IA(Thread):
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
+
+#Pour lancer le alphabeta sur un arbre il faut lancer la fonction
+
+"""
+prendre en compte le timing"""
+
+#alphabeta(board_init, 0, True, -float('inf'), float('inf'),max_depth)
