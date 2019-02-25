@@ -42,7 +42,7 @@ class Board( object ):
         self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
 
         self.__species = None
-
+        self.__win = 0
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -75,7 +75,7 @@ class Board( object ):
         self.__init__(n,m)
 
     @property
-    def m(self):
+    def width(self):
         """
         Get width
         """
@@ -84,7 +84,7 @@ class Board( object ):
     # END m
 
     @property
-    def n(self):
+    def height(self):
         """
         Get height
         """
