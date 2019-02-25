@@ -1,6 +1,7 @@
 import sys
-from servercomms.servercomms import SocketConnector
-from board.board import Board
+from servercomms import SocketConnector
+from board import Board
+from ia import IA
 
 if len(sys.argv) < 3:
     raise IOError("At least 2 arguments are required (IP and port).")
@@ -10,9 +11,14 @@ port = int(sys.argv[-1])
 
 socket = SocketConnector(ip, port)
 board = Board()
+ia = IA(board)
 
 socket.set_methods(board.build, board.set_species, board.update, board.update)
+ia.set_send_mov(socket.send_mov)
 
 socket.launch_game()
+
 socket.start()
+ia.start()
+
 socket.join()
