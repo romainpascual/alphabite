@@ -93,11 +93,11 @@ class Board( object ):
     
     # END height
 
-    def get_cell(self, i, j):
+    def get_cell(self, pos):
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__mat[i][j]
+        return self.__mat[pos[0]][pos[1]]
 
     # END get_cell
 
