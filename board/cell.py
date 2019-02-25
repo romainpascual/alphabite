@@ -57,15 +57,3 @@ class Cell( object ):
     @group_size.setter
     def group_size(self, group_size):
         self.__group_size = group_size
-    
-    # ----------------------------------------------------------------------------
-    # -- BASIC FUNCTIONS
-    # ----------------------------------------------------------------------------
-
-    def update_cell(self, upd):
-        """
-        Update a cell using a tuple (nb, species)
-        If nb=0, then specie=None
-        """
-        self.__group_size = upd[0]
-        self.__species = upd[1]

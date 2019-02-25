@@ -171,6 +171,9 @@ class Board( object ):
     # END get_species
 
     def update_cell(self, new_cell):
+        """
+        Update cell content
+        """
         old_cell = self.__mat[new_cell.x][new_cell.y]
         self.upd_species(old_cell.species, (-1)*old_cell.group_size)
         self.__mat[new_cell.x][new_cell.y] = new_cell
@@ -179,6 +182,9 @@ class Board( object ):
     # END update_cell
 
     def upd_species(self, species, number):
+        """
+        Update the population of a specie
+        """
         if species is None:
             pass
         elif species == 'w':
@@ -188,11 +194,11 @@ class Board( object ):
         elif species == 'v':
             self.__v += number
 
-    # END updSpecies
+    # END upd_species
         
     def heuristic(self):
         """
-        return the heuristic value of the board
+        Return the heuristic value of the board
         """
         try:
             return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
@@ -202,6 +208,9 @@ class Board( object ):
     # END heuristic
 
     def upd_win(self):
+        """
+        Update the win value
+        """
         if self.__species == "w" and self.__w == 0:
             self.__win = -1
         elif self.__species == "v" and self.__v == 0:
