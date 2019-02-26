@@ -22,19 +22,19 @@ class IA(Thread):
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
-        Parcours du graphe en alphabeta pour choisir le bestmove
-        :param src_board:
-        :param depth:
-        :param isMaximizingPlayer:
-        :param alpha:
-        :param beta:
-        :param max_depth:
-        :return:
+        Alphabeta AI to choose the best move to play
+        :param src_board: Actual Board on which we apply Alphabeta
+        :param depth: Actual depth of the graph
+        :param isMaximizingPlayer: True if max layer of the minimax and False otherwise
+        :param alpha: actual value of alpha in the alphabeta propagation
+        :param beta: actual value of beta in the alphabeta propagation
+        :param max_depth: Max propagation depth in graph
+        :return: best_move
         """
-        if src_board.win == 1: #on arrête si on a gagné
+        if src_board.win == 1: # on arrête si on a gagné
             return float('inf')
 
-        if src_board.win == -1: #on arrête si on a perdu aussi
+        if src_board.win == -1: # on arrête si on a perdu aussi
             return -float('inf')
 
         if depth == max_depth:
@@ -44,7 +44,7 @@ class IA(Thread):
             best_val = -float('inf')
             for board, move in self.__generator.get_all_possible_boards():
                 board = board[0][0]
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)[0]
+                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
@@ -58,7 +58,7 @@ class IA(Thread):
             best_val = float('inf')
             for board, move in self.__generator.get_all_possible_boards():
                 board = board[0][0]
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)[0]
+                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
@@ -79,9 +79,3 @@ class IA(Thread):
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
 
-#Pour lancer le alphabeta sur un arbre il faut lancer la fonction
-
-"""
-prendre en compte le timing"""
-
-#alphabeta(board_init, 0, True, -float('inf'), float('inf'),max_depth)
