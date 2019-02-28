@@ -10,7 +10,7 @@ import time
 
 
 class IA(Thread):
-    def __init__(self, src_board, max_depth=2):
+    def __init__(self, src_board, max_depth=5):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
@@ -72,7 +72,12 @@ class IA(Thread):
         while True:
             self.event.wait()
             tic = time.time()
-            self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), self.__max_depth,)
+            self.alphabeta(self.__src_board,
+                           depth=0,
+                           isMaximizingPlayer=True,
+                           alpha=-float('inf'),
+                           beta=float('inf'),
+                           max_depth=self.__max_depth)
             print("Sending after {:.3f}s".format(time.time()-tic))
             self.__send_mov([self.__best_move.parse_for_socket()])
 
