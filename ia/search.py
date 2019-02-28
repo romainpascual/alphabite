@@ -10,7 +10,7 @@ import time
 
 
 class IA(Thread):
-    def __init__(self, src_board, max_depth = 1):
+    def __init__(self, src_board, max_depth=5):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
@@ -18,69 +18,69 @@ class IA(Thread):
         self.__send_mov = None
         self.__max_depth = max_depth
 
+        self.event = None  # TODO: better event handling to allow for calculation during opponent turn
+
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
-        Parcours du graphe en alphabeta pour choisir le bestmove
-        :param src_board:
-        :param depth:
-        :param isMaximizingPlayer:
-        :param alpha:
-        :param beta:
-        :param max_depth:
-        :return:
+        Alphabeta AI to choose the best move to play
+        :param src_board: Actual Board on which we apply Alphabeta
+        :param depth: Actual depth of the graph
+        :param isMaximizingPlayer: True if max layer of the minimax and False otherwise
+        :param alpha: actual value of alpha in the alphabeta propagation
+        :param beta: actual value of beta in the alphabeta propagation
+        :param max_depth: Max propagation depth in graph
+        :return: best_move
         """
-        if src_board.win == 1: #on arrête si on a gagné
-            return float('inf'), None
+        if src_board.win == 1: # on arrête si on a gagné
+            return float('inf')
 
-        if src_board.win == -1: #on arrête si on a perdu aussi
-            return -float('inf'), None
+        if src_board.win == -1: # on arrête si on a perdu aussi
+            return -float('inf')
 
         if depth == max_depth:
-            return src_board.heuristic(), None
+            return src_board.heuristic()
 
         if isMaximizingPlayer:
             best_val = -float('inf')
-            best_move = None
-            for (board, move) in self.__generator.get_all_possible_boards():
+            for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
                 value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
-                    best_move = move
                     if depth == 0:
-                        self.__best_move = best_move
+                        self.__best_move = move
                 alpha = max(alpha, best_val)
                 if beta <= alpha:
                     break
-            return best_val, best_move
+            return best_val
 
         else:
             best_val = float('inf')
-            best_move = None
-            for (board, move) in self.__generator.get_all_possible_boards():
+            for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
                 value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
-                    best_move = move
                     if depth == 0:
-                        self.__best_move = best_move
+                        self.__best_move = move
                 beta = min(beta, best_val)
                 if beta <= alpha:
                     break
-            return best_val, best_move
+            return best_val
 
     def run(self):
-        self.alphabeta(self.__src_board, 0, True, -float('inf'), float('inf'), self.__max_depth)
-        tic = time.time()
-        while time.time()-tic <= 2:
-            continue
-        self.__send_mov(self.__best_move.parse_for_socket())
+        while True:
+            self.event.wait()
+            tic = time.time()
+            self.alphabeta(self.__src_board,
+                           depth=0,
+                           isMaximizingPlayer=True,
+                           alpha=-float('inf'),
+                           beta=float('inf'),
+                           max_depth=self.__max_depth)
+            print("Sending after {:.3f}s".format(time.time()-tic))
+            self.__send_mov([self.__best_move.parse_for_socket()])
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
 
-#Pour lancer le alphabeta sur un arbre il faut lancer la fonction
-
-"""
-prendre en compte le timing"""
-
-#alphabeta(board_init, 0, True, -float('inf'), float('inf'),max_depth)
