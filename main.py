@@ -24,3 +24,4 @@ socket.start()
 ia.start()
 
 socket.join()
+ia.turn_off()
