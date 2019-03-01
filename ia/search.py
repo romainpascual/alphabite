@@ -60,9 +60,9 @@ class IA(Thread):
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
+                if beta <= best_val:
+                    return best_val
                 alpha = max(alpha, best_val)
-                if beta <= alpha:
-                    break
             return best_val
 
         else:
@@ -72,13 +72,13 @@ class IA(Thread):
             for board, move in self.__generator.get_all_possible_boards():
                 board = board[0][0]
                 value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
-                if best_val < value:
+                if value < best_val:
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
+                if best_val <= alpha:
+                    return best_val
                 beta = min(beta, best_val)
-                if beta <= alpha:
-                    break
             return best_val
 
     def turn_off(self):
