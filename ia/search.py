@@ -14,7 +14,6 @@ class IA(Thread):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
-        self.__generator = BoardGenerator(src_board)
         self.__send_mov = None
         self.__max_depth = max_depth
         self.__my_species = None
@@ -40,20 +39,13 @@ class IA(Thread):
         :return: best_move
         """
 
-        if src_board.win == 1: # on arrête si on a gagné
-            return float('inf')
-
-        if src_board.win == -1: # on arrête si on a perdu aussi
-            return -float('inf')
-
         if depth == max_depth:
-            return src_board.heuristic()
+            return src_board.heuristic(self.__my_species)
 
         if isMaximizingPlayer:
-            src_board.species = self.__my_species
-            self.__generator = BoardGenerator(src_board)
+            generator = BoardGenerator(src_board, self.__my_species)
             best_val = -float('inf')
-            for board_with_probability, move in self.__generator.get_all_possible_boards():
+            for board_with_probability, move in generator.get_all_possible_boards():
                 board = board_with_probability[0]
                 p = board_with_probability[1]
                 value = p * self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
@@ -67,10 +59,9 @@ class IA(Thread):
             return best_val
 
         else:
-            src_board.species = self.__enemy_species
-            self.__generator = BoardGenerator(src_board)
+            generator = BoardGenerator(src_board, self.__enemy_species)
             best_val = float('inf')
-            for board_with_probability, move in self.__generator.get_all_possible_boards():
+            for board_with_probability, move in generator.get_all_possible_boards():
                 board = board_with_probability[0]
                 p = board_with_probability[1]
                 value = p * self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)

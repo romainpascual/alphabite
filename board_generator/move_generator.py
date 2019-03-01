@@ -3,13 +3,14 @@ from .change import Change
 
 
 class MoveGenerator:
-    def __init__(self, board):
+    def __init__(self, board, species):
         self.__board = board
+        self.__species = species
 
     def get_all_possible_moves(self):
         # Return an array of move objects that the IA can possibly perform given the state of the board
         possible_moves = [] # array of Move objects
-        friend_cells = self.__board.friend_cells
+        friend_cells = self.__board.get_cells(self.__species)
         for friend_cell in friend_cells:
             possible_moves = possible_moves + self.get_possible_moves(friend_cell)
         return possible_moves
