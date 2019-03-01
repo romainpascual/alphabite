@@ -52,7 +52,7 @@ class Board:
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
-    # END def __init__
+    # END __init__
 
     def __copy__(self):
         """
@@ -73,6 +73,7 @@ class Board:
         other_board.__friend_cells = self.__friend_cells.copy()
 
         return other_board
+    # END __copy__
 
     def __repr__(self):
         repr_str = str()
@@ -84,6 +85,7 @@ class Board:
                 repr_str += '{}{} '.format(group_size, species)
             repr_str += '\n'
         return repr_str
+    # END __repr__
 
     @staticmethod
     def create_from_board(previous_board, cell_list):
@@ -213,7 +215,6 @@ class Board:
         self.__err_msg = ""
 
         print(repr(self))
-
     # END update
 
     def set_species(self, x, y):
