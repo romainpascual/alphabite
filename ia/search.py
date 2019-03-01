@@ -18,7 +18,7 @@ class IA(Thread):
         self.__send_mov = None
         self.__max_depth = max_depth
         self.__my_species = src_board.species
-        self.__enemy_species = self.__my_species == 'v' ? 'w' : 'v'
+        self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
 
         self.__shouldRun = True
 
