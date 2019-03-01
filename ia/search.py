@@ -17,12 +17,16 @@ class IA(Thread):
         self.__generator = BoardGenerator(src_board)
         self.__send_mov = None
         self.__max_depth = max_depth
-        self.__my_species = src_board.species
-        self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
+        self.__my_species = None
+        self.__enemy_species = None
 
         self.__shouldRun = True
 
         self.event = None  # TODO: better event handling to allow for calculation during opponent turn
+
+    def set_species(self, species):
+        self.__my_species = species
+        self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
