@@ -62,8 +62,8 @@ class Board:
         other_board = Board()
 
         # Copy the attributes
-        other_board.__n = self.__n
-        other_board.__m = self.__m
+        other_board.__n = self.__X
+        other_board.__m = self.__Y
         other_board.__cells = self.__cells.copy()
         other_board.__species = self.__species
         other_board.__h = self.__h
