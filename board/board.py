@@ -36,7 +36,7 @@ class Board:
         self.__err_msg = "Board.init()"
     
         # Attributs
-        self.__X = x__cell
+        self.__X = x
         self.__Y = y
         self.__cells = dict()
         for i in range (self.__X):
@@ -263,3 +263,4 @@ class Board:
         except ZeroDivisionError:
             return inf # to match the IA requirements 
     # END heuristic
+
