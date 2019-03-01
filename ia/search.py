@@ -17,6 +17,8 @@ class IA(Thread):
         self.__generator = BoardGenerator(src_board)
         self.__send_mov = None
         self.__max_depth = max_depth
+        self.__my_species = src_board.species
+        self.__enemy_species = self.__my_species == 'v' ? 'w' : 'v'
 
         self.__shouldRun = True
 
@@ -33,6 +35,7 @@ class IA(Thread):
         :param max_depth: Max propagation depth in graph
         :return: best_move
         """
+
         if src_board.win == 1: # on arrête si on a gagné
             return float('inf')
 
@@ -43,9 +46,10 @@ class IA(Thread):
             return src_board.heuristic()
 
         if isMaximizingPlayer:
+            src_board.species = self.__my_species
+            self.__generator = BoardGenerator(src_board)
             best_val = -float('inf')
             for board, move in self.__generator.get_all_possible_boards():
-                board = board[0][0]
                 value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
@@ -57,9 +61,10 @@ class IA(Thread):
             return best_val
 
         else:
+            src_board.species = self.__enemy_species
+            self.__generator = BoardGenerator(src_board)
             best_val = float('inf')
             for board, move in self.__generator.get_all_possible_boards():
-                board = board[0][0]
                 value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
@@ -94,4 +99,3 @@ class IA(Thread):
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
-
