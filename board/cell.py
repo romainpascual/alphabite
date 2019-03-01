@@ -23,6 +23,13 @@ class Cell:
 
     # END def __init__
 
+    def __copy__(self):
+        """
+        The copy() method returns a shallow copy of the cell
+        """
+        other_cell = Cell(self.x, self.y, self.species, self.group_size)
+        return other_cell
+
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------

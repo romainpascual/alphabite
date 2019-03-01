@@ -7,6 +7,7 @@
 # -- Program modules
 from .cell import Cell
 from copy import copy
+from math import inf
 
 ##
 # @brief A tool for board simulation
@@ -117,7 +118,7 @@ class Board:
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__cells[(pos[0],pos[1])]
+        return self.__cells[(pos[0],pos[1])].copy()
     # END get_cell
 
     @property
@@ -260,5 +261,5 @@ class Board:
         try:
             return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
         except ZeroDivisionError:
-            return 0 # to match the IA requirements 
+            return inf # to match the IA requirements 
     # END heuristic
