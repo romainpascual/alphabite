@@ -55,7 +55,8 @@ class IA(Thread):
             best_val = -float('inf')
             for board_with_probability, move in self.__generator.get_all_possible_boards():
                 board = board_with_probability[0]
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
+                p = board_with_probability[1]
+                value = p * self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
@@ -71,7 +72,8 @@ class IA(Thread):
             best_val = float('inf')
             for board_with_probability, move in self.__generator.get_all_possible_boards():
                 board = board_with_probability[0]
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
+                p = board_with_probability[1]
+                value = p * self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if value < best_val:
                     best_val = value
                     if depth == 0:
