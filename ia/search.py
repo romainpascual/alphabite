@@ -14,13 +14,18 @@ class IA(Thread):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
-        self.__generator = BoardGenerator(src_board)
         self.__send_mov = None
         self.__max_depth = max_depth
+        self.__my_species = None
+        self.__enemy_species = None
 
         self.__shouldRun = True
 
         self.event = None  # TODO: better event handling to allow for calculation during opponent turn
+
+    def set_species(self, species):
+        self.__my_species = species
+        self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
@@ -33,41 +38,40 @@ class IA(Thread):
         :param max_depth: Max propagation depth in graph
         :return: best_move
         """
-        if src_board.win == 1: # on arrête si on a gagné
-            return float('inf')
-
-        if src_board.win == -1: # on arrête si on a perdu aussi
-            return -float('inf')
 
         if depth == max_depth:
-            return src_board.heuristic()
+            return src_board.heuristic(self.__my_species)
 
         if isMaximizingPlayer:
+            generator = BoardGenerator(src_board, self.__my_species)
             best_val = -float('inf')
-            for board, move in self.__generator.get_all_possible_boards():
-                board = board[0][0]
-                value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
+            for board_with_probability, move in generator.get_all_possible_boards():
+                board = board_with_probability[0]
+                p = board_with_probability[1]
+                value = p * self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
+                if beta <= best_val:
+                    return best_val
                 alpha = max(alpha, best_val)
-                if beta <= alpha:
-                    break
             return best_val
 
         else:
+            generator = BoardGenerator(src_board, self.__enemy_species)
             best_val = float('inf')
-            for board, move in self.__generator.get_all_possible_boards():
-                board = board[0][0]
-                value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
-                if best_val < value:
+            for board_with_probability, move in generator.get_all_possible_boards():
+                board = board_with_probability[0]
+                p = board_with_probability[1]
+                value = p * self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
+                if value < best_val:
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
+                if best_val <= alpha:
+                    return best_val
                 beta = min(beta, best_val)
-                if beta <= alpha:
-                    break
             return best_val
 
     def turn_off(self):
@@ -94,4 +98,3 @@ class IA(Thread):
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
-

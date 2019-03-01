@@ -16,9 +16,11 @@ ia = IA(board)
 socket.set_methods(board.build, board.set_species, board.update, board.update)
 ia.set_send_mov(socket.send_mov)
 
+
 ia.event = socket.event
 
 socket.launch_game()
+ia.set_species(board.species)
 
 socket.start()
 ia.start()

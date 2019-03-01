@@ -7,6 +7,7 @@
 # -- Program modules
 from .cell import Cell
 from copy import copy
+from math import inf
 
 ##
 # @brief A tool for board simulation
@@ -28,27 +29,29 @@ class Board:
 
     def __init__(
             self,
-            n=0,
-            m=0):
+            x=0,
+            y=0):
         # -- Errors
         self.__err_code = Board.FAILURE
         self.__err_msg = "Board.init()"
     
         # Attributs
-        self.__n = n
-        self.__m = m
-        self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
-        self.__species = ""
+        self.__X = x
+        self.__Y = y
+        self.__cells = dict()
+        for i in range(self.__X):
+            for j in range(self.__Y):
+                self.__cells[(i, j)] = Cell(i,j, None, 0)
         self.__h = 0
         self.__v = 0
         self.__w = 0
-        self.__win = 0
-        self.__friend_cells = dict()
+        self.__v_cells = dict()
+        self.__w_cells = dict()
 
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
-    # END def __init__
+    # END __init__
 
     def __copy__(self):
         """
@@ -58,17 +61,29 @@ class Board:
         other_board = Board()
 
         # Copy the attributes
-        other_board.__n = self.__n
-        other_board.__m = self.__m
-        other_board.__mat = self.__mat.copy()
-        other_board.__species = self.__species
+        other_board.__X = self.__X
+        other_board.__Y = self.__Y
+        other_board.__cells = self.__cells.copy()
         other_board.__h = self.__h
         other_board.__v = self.__v
         other_board.__w = self.__w
-        other_board.__win = self.__win
-        other_board.__friend_cells = self.__friend_cells.copy()
+        other_board.__v_cells = self.__v_cells.copy()
+        other_board.__w_cells = self.__w_cells.copy()
 
         return other_board
+    # END __copy__
+
+    def __repr__(self):
+        repr_str = str()
+        for j in range(self.__Y):
+            for i in range(self.__X):
+                cell = self.__cells[(i, j)]
+                group_size = cell.group_size
+                species = cell.species if cell.species else ' '
+                repr_str += '{}{} '.format(group_size, species)
+            repr_str += '\n'
+        return repr_str
+    # END __repr__
 
     @staticmethod
     def create_from_board(previous_board, cell_list):
@@ -86,12 +101,12 @@ class Board:
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------
 
-    def build(self, n , m):
+    def build(self, x , y):
         """
         Build the board with the given sizes.
         Can be used to reset the map.
         """
-        self.__init__(n,m)
+        self.__init__(x,y)
     # END build
 
     @property
@@ -99,7 +114,7 @@ class Board:
         """
         Get width
         """
-        return self.__m
+        return self.__X
     # END width
 
     @property
@@ -107,14 +122,14 @@ class Board:
         """
         Get height
         """
-        return self.__n
+        return self.__Y
     # END height
 
     def get_cell(self, pos):
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__mat[pos[0]][pos[1]]
+        return copy(self.__cells[(pos[0], pos[1])])
     # END get_cell
 
     @property
@@ -142,27 +157,30 @@ class Board:
     # END werewolves
 
     @property
-    def win(self):
+    def v_cells(self):
         """
-        Return the winning status (1 if won, -1 if lost, 0 o.w.)
+        Return the cells of vampires as a list
         """
-        return self.__win
-    # END win
+        return [copy(cell) for cell in self.__v_cells.values()]
+    # END v_cells
 
     @property
-    def species(self):
+    def w_cells(self):
         """
-        Return our species
+        Return the cells of werevolves as a list
         """
-        return self.__species
-    # END species
-
-    @property
-    def friend_cells(self):
+        return [copy(cell) for cell in self.__w_cells.values()]
+    # END w_cells
+    
+    def get_cells(self, species):
         """
-        Return the cells of our specie as a list
+        Return the cells of species as a list
         """
-        return list(self.__friend_cells.values())
+        if species == 'v':
+            return self.v_cells
+        elif species == 'w':
+            return self.w_cells
+    # END get_cells
 
     # ----------------------------------------------------------------------------
     # -- UPDATE
@@ -180,83 +198,61 @@ class Board:
         for up in upd:
             newCell = Cell(up[0], up[1], up[2][0], up[2][1])
             self.update_cell(newCell)
-        
-        self.upd_win()
 
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
+
+        print(repr(self))
     # END update
 
-    def set_species(self, x, y):
-        """
-        Using the home cell, find out which species we are
-        """
-        self.__species = self.__mat[x][y].species
-        for row in self.__mat:
-            for cell in row:
-                self.upd_friend_cells(cell)
-    # END set_species
     
     def update_cell(self, new_cell):
         """
         Update cell content
         """
-        old_cell = self.__mat[new_cell.x][new_cell.y]
-        self.upd_species(old_cell.species, (-1)*old_cell.group_size)
-        self.__mat[new_cell.x][new_cell.y] = new_cell
-        self.upd_species(new_cell.species, new_cell.group_size)
-        self.upd_friend_cells(new_cell)
-    # END update_cell
+        x = new_cell.x
+        y =  new_cell.y
+        old_cell = self.__cells[(x, y)]
 
-    def upd_species(self, species, number):
-        """
-        Update the population of a specie
-        """
-        if species is None:
+        # process the previous cell
+        if old_cell.species is None:
             pass
-        elif species == 'w':
-            self.__w += number
-        elif species == 'h':
-            self.__h += number
-        elif species == 'v':
-            self.__v += number
-    # END upd_species
+        elif old_cell.species == 'h':
+            self.__h -= old_cell.group_size
+        elif old_cell.species == 'v':
+            self.__v -= old_cell.group_size
+            self.__v_cells.pop((x,y), None)
+        elif old_cell.species == 'w':
+            self.__w -= old_cell.group_size
+            self.__w_cells.pop((x,y), None)
+        
+        # process the new cell
+        if new_cell.species is None:
+            pass
+        elif new_cell.species == 'h':
+            self.__h += new_cell.group_size
+        elif new_cell.species == 'v':
+            self.__v += new_cell.group_size
+            self.__v_cells[(x,y)] = new_cell
+        elif new_cell.species == 'w':
+            self.__w += new_cell.group_size
+            self.__w_cells[(x,y)] = new_cell
 
-    def upd_win(self):
-        """
-        Update the win value
-        """
-        if self.__species == "w" and self.__w == 0:
-            self.__win = -1
-        elif self.__species == "v" and self.__v == 0:
-            self.__win = -1
-        elif self.__species == "w" and self.__v == 0:
-            self.__win = 1
-        elif self.__species == "v" and self.__w == 0:
-            self.__win = 1
-    # END upd_win
-
-    def upd_friend_cells(self, cell):
-        """
-        Update the friendly cells
-        """
-        if cell.species == self.__species:
-            self.__friend_cells[(cell.x,cell.y)] = cell
-        else:
-            self.__friend_cells.pop((cell.x,cell.y), None)
-    # END upd_friend_cells
+        self.__cells[(x,y)] = new_cell
+    # END update_cell
 
     # ----------------------------------------------------------------------------
     # -- PLAYS
     # ----------------------------------------------------------------------------
 
-    def heuristic(self):
+    def heuristic(self, species):
         """
-        Return the heuristic value of the board
+        Return the heuristic value of the board, assuming max player is playing species
         """
         try:
-            return self.__w / self.__v if self.__species == "w" else self.__v / self.__w
+            return self.__w / self.__v if species == "w" else self.__v / self.__w
         except ZeroDivisionError:
-            return 0 # to match the IA requirements 
+            return inf # to match the IA requirements 
     # END heuristic
+

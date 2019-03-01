@@ -4,15 +4,16 @@ from .misc import comb
 
 
 class BoardGenerator:
-    def __init__(self, src_board):
+    def __init__(self, src_board, species):
         self.__src_board = src_board
-        self.__move_generator = MoveGenerator(src_board)
+        self.__species = species
+        self.__move_generator = MoveGenerator(src_board, species)
 
     def get_all_possible_boards(self):
-        possible_boards = []  # Array of tuples (Board objects associated with a probability, Move object)
         possible_moves = self.__move_generator.get_all_possible_moves()
         for possible_move in possible_moves:
-            yield self.get_possible_boards(possible_move), possible_move
+            for possible_board in self.get_possible_boards(possible_move):
+                yield (possible_board, possible_move)  # (Board objects associated with a probability, Move object)
 
     def get_possible_boards(self, move):
         src_cell = move.src_cell  # Cell object
