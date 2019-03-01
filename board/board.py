@@ -39,9 +39,9 @@ class Board:
         self.__X = x
         self.__Y = y
         self.__cells = dict()
-        for i in range (self.__X):
+        for i in range(self.__X):
             for j in range(self.__Y):
-                self.__cells[(i,j)] = Cell(i,j, None, 0)
+                self.__cells[(i, j)] = Cell(i,j, None, 0)
         self.__species = ""
         self.__h = 0
         self.__v = 0
@@ -62,8 +62,8 @@ class Board:
         other_board = Board()
 
         # Copy the attributes
-        other_board.__n = self.__n
-        other_board.__m = self.__m
+        other_board.__n = self.__X
+        other_board.__m = self.__Y
         other_board.__cells = self.__cells.copy()
         other_board.__species = self.__species
         other_board.__h = self.__h
@@ -73,6 +73,17 @@ class Board:
         other_board.__friend_cells = self.__friend_cells.copy()
 
         return other_board
+
+    def __repr__(self):
+        repr_str = str()
+        for j in range(self.__Y):
+            for i in range(self.__X):
+                cell = self.__cells[(i, j)]
+                group_size = cell.group_size
+                species = cell.species if cell.species else ' '
+                repr_str += '{}{} '.format(group_size, species)
+            repr_str += '\n'
+        return repr_str
 
     @staticmethod
     def create_from_board(previous_board, cell_list):
@@ -118,7 +129,7 @@ class Board:
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__cells[(pos[0],pos[1])].copy()
+        return copy(self.__cells[(pos[0], pos[1])])
     # END get_cell
 
     @property
@@ -200,6 +211,9 @@ class Board:
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
+
+        print(repr(self))
+
     # END update
 
     def set_species(self, x, y):
