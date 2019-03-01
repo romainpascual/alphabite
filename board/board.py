@@ -39,9 +39,9 @@ class Board:
         self.__X = x
         self.__Y = y
         self.__cells = dict()
-        for i in range (self.__X):
+        for i in range(self.__X):
             for j in range(self.__Y):
-                self.__cells[(i,j)] = Cell(i,j, None, 0)
+                self.__cells[(i, j)] = Cell(i,j, None, 0)
         self.__species = ""
         self.__h = 0
         self.__v = 0
