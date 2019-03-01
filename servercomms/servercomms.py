@@ -151,7 +151,7 @@ class SocketConnector(Thread):
         while self.active_connection:
             self.__get_upd()
 
-        print('Ran.')
+        print('Quitting socket.')
 
 
 if __name__ == '__main__':

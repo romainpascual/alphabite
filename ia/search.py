@@ -18,6 +18,8 @@ class IA(Thread):
         self.__send_mov = None
         self.__max_depth = max_depth
 
+        self.__shouldRun = True
+
         self.event = None  # TODO: better event handling to allow for calculation during opponent turn
 
     def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
@@ -68,18 +70,27 @@ class IA(Thread):
                     break
             return best_val
 
+    def turn_off(self):
+        self.__shouldRun = False
+        t = 4
+        while t:
+            print('Turning off IA in {} seconds.'.format(t), end='\r')
+            time.sleep(1)
+            t -= 1
+
     def run(self):
-        while True:
-            self.event.wait()
-            tic = time.time()
-            self.alphabeta(self.__src_board,
-                           depth=0,
-                           isMaximizingPlayer=True,
-                           alpha=-float('inf'),
-                           beta=float('inf'),
-                           max_depth=self.__max_depth)
-            print("Sending after {:.3f}s".format(time.time()-tic))
-            self.__send_mov([self.__best_move.parse_for_socket()])
+        while self.__shouldRun:
+            if self.event.wait(4.):
+                tic = time.time()
+                self.alphabeta(self.__src_board,
+                               depth=0,
+                               isMaximizingPlayer=True,
+                               alpha=-float('inf'),
+                               beta=float('inf'),
+                               max_depth=self.__max_depth)
+                print("Sending after {:.3f}s".format(time.time()-tic))
+                self.__send_mov([self.__best_move.parse_for_socket()])
+        print('IA is shutdown.', ' '*20)
 
     def set_send_mov(self, send_mov_func):
         self.__send_mov = send_mov_func
