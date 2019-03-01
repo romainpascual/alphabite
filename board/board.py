@@ -10,7 +10,7 @@ from copy import copy
 
 ##
 # @brief A tool for board simulation
-#
+#__cell
 
 class Board:
     
@@ -28,16 +28,19 @@ class Board:
 
     def __init__(
             self,
-            n=0,
-            m=0):
+            x=0,
+            y=0):
         # -- Errors
         self.__err_code = Board.FAILURE
         self.__err_msg = "Board.init()"
     
         # Attributs
-        self.__n = n
-        self.__m = m
-        self.__mat = [[Cell(x, y, None, 0) for x in range(self.__m)] for y in range(self.__n)]
+        self.__X = x__cell
+        self.__Y = y
+        self.__cells = dict()
+        for i in range (self.__X):
+            for j in range(self.__Y):
+                self.__cells[(i,j)] = Cell(i,j, None, 0)
         self.__species = ""
         self.__h = 0
         self.__v = 0
@@ -60,7 +63,7 @@ class Board:
         # Copy the attributes
         other_board.__n = self.__n
         other_board.__m = self.__m
-        other_board.__mat = self.__mat.copy()
+        other_board.__cells = self.__cells.copy()
         other_board.__species = self.__species
         other_board.__h = self.__h
         other_board.__v = self.__v
@@ -86,12 +89,12 @@ class Board:
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------
 
-    def build(self, n , m):
+    def build(self, x , y):
         """
         Build the board with the given sizes.
         Can be used to reset the map.
         """
-        self.__init__(n,m)
+        self.__init__(x,y)
     # END build
 
     @property
@@ -99,7 +102,7 @@ class Board:
         """
         Get width
         """
-        return self.__m
+        return self.__X
     # END width
 
     @property
@@ -107,14 +110,14 @@ class Board:
         """
         Get height
         """
-        return self.__n
+        return self.__Y
     # END height
 
     def get_cell(self, pos):
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__mat[pos[0]][pos[1]]
+        return self.__cells[(pos[0],pos[1])]
     # END get_cell
 
     @property
@@ -192,9 +195,8 @@ class Board:
         """
         Using the home cell, find out which species we are
         """
-        self.__species = self.__mat[x][y].species
-        for row in self.__mat:
-            for cell in row:
+        self.__species = self.__cells[(x,y)].species
+        for cell in self.__cells.values():
                 self.upd_friend_cells(cell)
     # END set_species
     
@@ -202,9 +204,9 @@ class Board:
         """
         Update cell content
         """
-        old_cell = self.__mat[new_cell.x][new_cell.y]
+        old_cell = self.__cells[(new_cell.x, new_cell.y)]
         self.upd_species(old_cell.species, (-1)*old_cell.group_size)
-        self.__mat[new_cell.x][new_cell.y] = new_cell
+        self.__cells[(new_cell.x,new_cell.y)] = new_cell
         self.upd_species(new_cell.species, new_cell.group_size)
         self.upd_friend_cells(new_cell)
     # END update_cell
