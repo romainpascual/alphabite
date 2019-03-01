@@ -159,6 +159,15 @@ class Board:
         Return our species
         """
         return self.__species
+
+    @species.setter
+    def species(self, species):
+        """
+        Change the species
+        """
+        self.__species = species
+        for cell in self.__cells.values():
+            self.upd_friend_cells(cell)
     # END species
 
     @property
@@ -167,6 +176,7 @@ class Board:
         Return the cells of our specie as a list
         """
         return list(self.__friend_cells.values())
+    # END friend_cells
 
     # ----------------------------------------------------------------------------
     # -- UPDATE
@@ -198,7 +208,7 @@ class Board:
         """
         self.__species = self.__cells[(x,y)].species
         for cell in self.__cells.values():
-                self.upd_friend_cells(cell)
+            self.upd_friend_cells(cell)
     # END set_species
     
     def update_cell(self, new_cell):
