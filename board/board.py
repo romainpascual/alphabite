@@ -129,7 +129,7 @@ class Board:
         """
         Return the content of the cell at position(i,j)
         """
-        return self.__cells[(pos[0],pos[1])].copy()
+        return copy(self.__cells[(pos[0], pos[1])])
     # END get_cell
 
     @property
