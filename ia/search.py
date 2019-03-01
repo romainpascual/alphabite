@@ -49,8 +49,8 @@ class IA(Thread):
             src_board.species = self.__my_species
             self.__generator = BoardGenerator(src_board)
             best_val = -float('inf')
-            for board, move in self.__generator.get_all_possible_boards():
-                board = board[0][0]
+            for board_with_probability, move in self.__generator.get_all_possible_boards():
+                board = board_with_probability[0]
                 value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
@@ -65,8 +65,8 @@ class IA(Thread):
             src_board.species = self.__enemy_species
             self.__generator = BoardGenerator(src_board)
             best_val = float('inf')
-            for board, move in self.__generator.get_all_possible_boards():
-                board = board[0][0]
+            for board_with_probability, move in self.__generator.get_all_possible_boards():
+                board = board_with_probability[0]
                 value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
