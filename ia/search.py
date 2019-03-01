@@ -10,9 +10,7 @@ import time
 
 
 class IA(Thread):
-    IA.MAX_DEPTH = 5
-
-    def __init__(self, src_board, max_depth=IA.MAX_DEPTH):
+    def __init__(self, src_board, max_depth=5):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
@@ -26,7 +24,7 @@ class IA(Thread):
 
         self.event = None  # TODO: better event handling to allow for calculation during opponent turn
 
-    def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=IA.MAX_DEPTH):
+    def alphabeta(self, src_board, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
         Alphabeta AI to choose the best move to play
         :param src_board: Actual Board on which we apply Alphabeta
@@ -52,6 +50,7 @@ class IA(Thread):
             self.__generator = BoardGenerator(src_board)
             best_val = -float('inf')
             for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
                 value = self.alphabeta(board, depth + 1, False, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
@@ -67,6 +66,7 @@ class IA(Thread):
             self.__generator = BoardGenerator(src_board)
             best_val = float('inf')
             for board, move in self.__generator.get_all_possible_boards():
+                board = board[0][0]
                 value = self.alphabeta(board, depth + 1, True, alpha, beta, max_depth)
                 if best_val < value:
                     best_val = value
