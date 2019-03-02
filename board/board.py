@@ -241,9 +241,20 @@ class Board:
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
-        try:
+        win_value = 5
+        lose_value = -10
+        if self.__v == 0:
+            if species == 'v':
+                return lose_value
+            else:
+                return win_value
+        elif self.__w == 0:
+            if species == 'v':
+                return win_value
+            else:
+                return lose_value
+        else:
             return self.__w / self.__v if species == "w" else self.__v / self.__w
-        except ZeroDivisionError:
-            return inf # to match the IA requirements 
+
     # END heuristic
 
