@@ -24,11 +24,19 @@ class PlayingBoard( Board ):
         """
         A tool to handle the playing board
         """
-        super().__init__(self)
+        super().__init__()
 
         # Attributs
         self.__species = ""    
     # END init
+
+    def build(self, x, y):
+        """
+        Build the board with the given sizes.
+        Can be used to reset the map.
+        """
+        super().__init__(x, y)
+    # END build
 
     @property
     def species(self):
@@ -49,7 +57,7 @@ class PlayingBoard( Board ):
         """
         Using the home cell, find out which species we are
         """
-        self.__species = self.__cells[(x,y)].species
+        self.__species = self._cells[(x, y)].species
     # END set_specie
 
     @property
@@ -58,7 +66,7 @@ class PlayingBoard( Board ):
         Return the friendly cells as a list
         """
         if self.__species == 'v':
-            return super().v_cells
+            return self.v_cells
         elif self.__species == 'w':
-            return super().w_cells
+            return self.w_cells
     # END friend_cells

@@ -38,10 +38,10 @@ class Board:
         # Attributs
         self.__X = x
         self.__Y = y
-        self.__cells = dict()
+        self._cells = dict()
         for i in range(self.__X):
             for j in range(self.__Y):
-                self.__cells[(i, j)] = Cell(i,j, None, 0)
+                self._cells[(i, j)] = Cell(i, j, None, 0)
         self.__h = 0
         self.__v = 0
         self.__w = 0
@@ -63,7 +63,7 @@ class Board:
         # Copy the attributes
         other_board.__X = self.__X
         other_board.__Y = self.__Y
-        other_board.__cells = self.__cells.copy()
+        other_board._cells = self._cells.copy()
         other_board.__h = self.__h
         other_board.__v = self.__v
         other_board.__w = self.__w
@@ -77,7 +77,7 @@ class Board:
         repr_str = str()
         for j in range(self.__Y):
             for i in range(self.__X):
-                cell = self.__cells[(i, j)]
+                cell = self._cells[(i, j)]
                 group_size = cell.group_size
                 species = cell.species if cell.species else ' '
                 repr_str += '{}{} '.format(group_size, species)
@@ -93,21 +93,13 @@ class Board:
         new_board = copy(previous_board)
         for cell in cell_list:
             new_board.update_cell(cell)
-        new_board.upd_win()
+        # new_board.upd_win()
         return new_board
     # END create_from_board
 
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------
-
-    def build(self, x , y):
-        """
-        Build the board with the given sizes.
-        Can be used to reset the map.
-        """
-        self.__init__(x,y)
-    # END build
 
     @property
     def width(self):
@@ -129,7 +121,7 @@ class Board:
         """
         Return the content of the cell at position(i,j)
         """
-        return copy(self.__cells[(pos[0], pos[1])])
+        return copy(self._cells[(pos[0], pos[1])])
     # END get_cell
 
     @property
@@ -206,14 +198,13 @@ class Board:
         print(repr(self))
     # END update
 
-    
     def update_cell(self, new_cell):
         """
         Update cell content
         """
         x = new_cell.x
         y =  new_cell.y
-        old_cell = self.__cells[(x, y)]
+        old_cell = self._cells[(x, y)]
 
         # process the previous cell
         if old_cell.species is None:
@@ -239,7 +230,7 @@ class Board:
             self.__w += new_cell.group_size
             self.__w_cells[(x,y)] = new_cell
 
-        self.__cells[(x,y)] = new_cell
+        self._cells[(x, y)] = new_cell
     # END update_cell
 
     # ----------------------------------------------------------------------------
