@@ -221,8 +221,6 @@ class Board:
         old_cell = self._cells[(x, y)]
 
         # process the previous cell
-        if old_cell.species is None:
-            return
         self.delete_cell_update_dist(old_cell)
         if old_cell.species == 'h':
             self.__h -= old_cell.group_size
@@ -235,8 +233,6 @@ class Board:
             self.__w_cells.pop((x,y), None)
         
         # process the new cell
-        if new_cell.species is None:
-            return
         self.create_cell_update_dist(new_cell)
         if new_cell.species == 'h':
             self.__h += new_cell.group_size
@@ -447,7 +443,6 @@ class Board:
                 specie_value = self.__v / self.__w
                 dist_value = self.__vw_min[0] * f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
                 human_value = self.__wh_min[0] - self.__vh_min[0]
-
         return specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
     # END heuristic
 
