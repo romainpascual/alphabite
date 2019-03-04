@@ -39,7 +39,7 @@ class IA(Thread):
         :return: best_move
         """
 
-        if depth == max_depth:
+        if depth == max_depth or src_board.is_winning_position:
             return src_board.heuristic(self.__my_species)
 
         if isMaximizingPlayer:

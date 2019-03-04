@@ -235,6 +235,13 @@ class Board:
     # -- PLAYS
     # ----------------------------------------------------------------------------
 
+    @property
+    def is_winning_position(self):
+        if self.__v == 0 or self.__w == 0:
+            return True
+        else:
+            return False
+
     def heuristic(self, species):
         """
         Return the heuristic value of the board, assuming max player is playing species
