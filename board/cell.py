@@ -37,6 +37,18 @@ class Cell:
         return other_cell
     # END __copy__
 
+    def __eq__(self, other):
+        """
+        return self==other.
+        """
+        return (
+            self.__class__ == other.__class__
+            and self.__x == other.__x
+            and self.__y == other.__y
+            and self.__species == other.__species
+            and self.__group_size == other.__group_size
+        )
+
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------

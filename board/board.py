@@ -49,6 +49,10 @@ class Board:
         self.__v_cells = dict()
         self.__w_cells = dict()
 
+        self.__vh_min = (inf, None, None)
+        self.__wh_min = (inf, None, None)
+        self.__vw_min = (inf, None, None)
+
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
@@ -71,6 +75,9 @@ class Board:
         other_board.__h_cells = self.__h_cells.copy()
         other_board.__v_cells = self.__v_cells.copy()
         other_board.__w_cells = self.__w_cells.copy()
+        other_board.__vh_min = self.__vh_min
+        other_board.__wh_min = self.__wh_min
+        other_board.__vw_min = self.__vw_min
 
         return other_board
     # END __copy__
@@ -215,8 +222,9 @@ class Board:
 
         # process the previous cell
         if old_cell.species is None:
-            pass
-        elif old_cell.species == 'h':
+            return
+        self.delete_cell_update_dist(old_cell)
+        if old_cell.species == 'h':
             self.__h -= old_cell.group_size
             self.__h_cells.pop((x,y), None)
         elif old_cell.species == 'v':
@@ -228,8 +236,9 @@ class Board:
         
         # process the new cell
         if new_cell.species is None:
-            pass
-        elif new_cell.species == 'h':
+            return
+        self.create_cell_update_dist(new_cell)
+        if new_cell.species == 'h':
             self.__h += new_cell.group_size
             self.__h_cells[(x,y)] = new_cell
         elif new_cell.species == 'v':
@@ -241,6 +250,145 @@ class Board:
 
         self._cells[(x, y)] = new_cell
     # END update_cell
+
+    # ----------------------------------------------------------------------------
+    # -- DISTANCE
+    # ----------------------------------------------------------------------------
+    def min_distance_from_to(self, cell, species):
+        """
+        Compute the minimal distance between cell to cells of the given species
+        Return dist, target_cell
+        """
+        target_cells = []
+        if species == 'h':
+            target_cells = self.h_cells
+        elif species == 'v':
+            target_cells = self.v_cells
+        elif species == 'w':
+            target_cells = self.w_cells
+
+        # handle empty cell list
+        if len(target_cells) == 0:
+            return inf, None
+
+        min_dist = inf
+        t = None
+        for t_cell in target_cells:
+                d = cell.dist_to(t_cell)
+                if d < min_dist:
+                    min_dist = d
+                    t = t_cell
+        return (min_dist, t)
+    # END min_distance_between_species
+
+    def min_distance_species(self, source_species, target_species):
+        """
+        Compute the minimal distance between cells of two species
+        Return dist, source_cell, target_cell
+        """
+        if source_species == 'h':
+            source_cells = self.h_cells
+        elif source_species == 'v':
+            source_cells = self.v_cells
+        elif source_species == 'w':
+            source_cells = self.w_cells
+
+        # handle empty cell list
+        if len(source_cells) == 0:
+            return inf, None
+        
+        min_dist = inf
+        s = None
+        t = None
+        for s_cell in source_cells:
+                d, t_cell = self.min_distance_from_to(s_cell, target_species)
+                if d < min_dist:
+                    min_dist, s, t = d, s_cell, t_cell
+        return (min_dist, s, t)
+    # END min_distance_species
+
+
+    def delete_cell_update_dist(self, cell):
+        """
+        When cell is deleted, update the min_distances
+        """
+        # humans
+        if cell.species == 'h':
+
+            # vampires
+            if self.__vh_min[2] == cell:
+                self.__vh_min = self.min_distance_species('v','h')
+
+            # werewolvev
+            if self.__wh_min[2] == cell:
+                self.__wh_min = self.min_distance_species('w','h')
+
+        # vampires
+        elif cell.species == 'v':
+
+            # humans
+            if self.__vh_min[1] == cell:
+                self.__vh_min = self.min_distance_species('v','h')
+            
+            # werewolves
+            if self.__vw_min[1] == cell:
+                self.__vw_min = self.min_distance_species('v','w')
+
+        # werewolves
+        elif cell.species == 'w':
+
+            # humans
+            if self.__wh_min[1] == cell:
+                self.__wh_min = self.min_distance_species('w','h')
+            
+            # vampires
+            if self.__vw_min[2] == cell:
+                self.__vw_min = self.min_distance_species('v','w')
+    # END delete_cell_update_dist
+
+    def create_cell_update_dist(self, cell):
+        """
+        When cell is created, update the min_distances
+        """
+        # humans
+        if cell.species == 'h':
+
+            # vampires
+            to_vampire = self.min_distance_from_to(cell,'v')
+            if self.__vh_min[0] > to_vampire[0]:
+                self.__vh_min = (to_vampire[0], to_vampire[1], cell)
+            
+            # werewolves
+            to_werewolf = self.min_distance_from_to(cell,'w')
+            if self.__wh_min[0] > to_werewolf[0]:
+                self.__wh_min = (to_werewolf[0], to_werewolf[1], cell)
+
+        # vampires  
+        elif cell.species == 'v':
+
+            # humans
+            to_human = self.min_distance_from_to(cell,'h')
+            if self.__vh_min[0] > to_human[0]:
+                self.__vh_min = (to_human[0], cell, to_human[1])
+            
+            # werewolves
+            to_werewolf = self.min_distance_from_to(cell,'w')
+            if self.__vw_min[0] > to_werewolf[0]:
+                self.__vw_min = (to_werewolf[0], cell, to_werewolf[1])
+         
+        # werewolves
+        elif cell.species == 'w':
+
+            # humans
+            to_human = self.min_distance_from_to(cell,'h')
+            if self.__wh_min[0] > to_human[0]:
+                self.__wh_min = (to_human[0], cell, to_human[1])
+            
+            # vampire
+            to_vampire = self.min_distance_from_to(cell,'v')
+            if self.__vw_min[0] > to_vampire[0]:
+                self.__vw_min = (to_vampire[0], to_vampire[1], cell)
+    # END create_cell_update_dist
 
     # ----------------------------------------------------------------------------
     # -- PLAYS
@@ -257,58 +405,21 @@ class Board:
             return False
     # END is_winning_position
 
-    def min_distance_between_species(self):
-        """
-        Compute the minimal distance between cells of different species
-        """
-        min_dist = inf
-        v = None
-        w = None
-        for v_cell in self.v_cells:
-            for w_cell in self.w_cells:
-                d = v_cell.dist_to(w_cell)
-                if d < min_dist:
-                    min_dist = d
-                    v = v_cell
-                    w = w_cell
-        return min_dist, v, w
-    # END min_distance_between_species
-
-    def min_distance_human(self, specie):
-        """
-        Compute the minimal distance between a human cell and a given specie cell
-        """
-        min_dist = inf
-        h = None
-        s = None
-        s_cells = self.v_cells if specie == 'v' else self.w_cells
-        for s_cell in s_cells:
-            for h_cell in self.h_cells:
-                d = s_cell.dist_to(h_cell)
-                if d < min_dist:
-                    min_dist = d
-                    s = s_cell
-                    h = h_cell
-        return min_dist, s, h
-    # END min_distance_human
-
     def heuristic(self, species, win_value=50, lose_value=-10, alpha_specie=10, alpha_dist=1, alpha_human=1):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
-
-        d_value, v_cell, w_cell = self.min_distance_between_species()
 
         def f(ratio):
             """
             function to evaluate the weight to give to the distance between the two closest cell on different species.
             """
             if ratio < 2./3.:
-                return -1.
-            elif ratio > 3./2.:
                 return 1.
+            elif ratio > 3./2.:
+                return -1.
             else:
-                return (-6.*ratio*ratio + 25.* ratio - 19)/5.
+                return (6.*ratio*ratio - 25.* ratio + 19)/5.
 
         if species == "w":
             if self.__w == 0:
@@ -316,9 +427,16 @@ class Board:
             elif self.__v == 0:
                 return win_value
             else:
+                # we want to maximize the ratio of our specie over the other specie
                 specie_value = self.__w / self.__v
-                dist_value = d_value * f(float(w_cell.group_size)/float(v_cell.group_size))
-                human_value = (self.min_distance_human('v')[0] - self.min_distance_human('w')[0])
+
+                # if the ratio is > 1, we want to minimze the distance
+                dist_value = self.__vw_min[0] * f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
+
+                # we want to maximize the distance for between the other specie and a human cell
+                human_value = self.__vh_min[0]
+                # we want to minimize the distance between our species and a human cell
+                human_value -= self.__wh_min[0]
         
         elif species == "v":
             if self.__v == 0:
@@ -327,8 +445,8 @@ class Board:
                 return win_value
             else:
                 specie_value = self.__v / self.__w
-                dist_value = d_value * f(float(v_cell.group_size)/float(w_cell.group_size))
-                human_value = (self.min_distance_human('w')[0] - self.min_distance_human('v')[0])
+                dist_value = self.__vw_min[0] * f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
+                human_value = self.__wh_min[0] - self.__vh_min[0]
 
         return specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
     # END heuristic
