@@ -3,6 +3,7 @@
 # @class Cell
 
 # -- Third-party modules
+import math
 
 ##
 # @brief A tool for cell handling
@@ -87,3 +88,20 @@ class Cell:
     def group_size(self, group_size):
         self.__group_size = group_size
     # END group_size
+
+    # ----------------------------------------------------------------------------
+    # -- AUX
+    # ----------------------------------------------------------------------------
+    
+    def dist_to(self, other):
+        """
+        Compute the distance between two cells.
+        The distance is computed as the number of moves for a group to go from a cell
+        to the other.
+        """
+        if not isinstance(other,Cell):
+            return
+        x_dist = abs(self.x - other.x)
+        y_dist = abs(self.y - other.y)
+        return max(x_dist, y_dist)
+    # END dist_to
