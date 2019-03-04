@@ -401,21 +401,22 @@ class Board:
             return False
     # END is_winning_position
 
+    @staticmethod
+    def f(ratio):
+        """
+        function to evaluate the weight to give to the distance between the two closest cell on different species.
+        """
+        if ratio < 2. / 3.:
+            return 1.
+        elif ratio > 3. / 2.:
+            return -1.
+        else:
+            return (6. * ratio * ratio - 25. * ratio + 19) / 5.
+
     def heuristic(self, species, win_value=50, lose_value=-10, alpha_specie=10, alpha_dist=1, alpha_human=1):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
-
-        def f(ratio):
-            """
-            function to evaluate the weight to give to the distance between the two closest cell on different species.
-            """
-            if ratio < 2./3.:
-                return 1.
-            elif ratio > 3./2.:
-                return -1.
-            else:
-                return (6.*ratio*ratio - 25.* ratio + 19)/5.
 
         if species == "w":
             if self.__w == 0:
@@ -427,21 +428,21 @@ class Board:
                 specie_value = self.__w / self.__v
 
                 # if the ratio is > 1, we want to minimze the distance
-                dist_value = self.__vw_min[0] * f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
+                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
 
                 # we want to maximize the distance for between the other specie and a human cell
                 human_value = self.__vh_min[0]
                 # we want to minimize the distance between our species and a human cell
                 human_value -= self.__wh_min[0]
         
-        elif species == "v":
+        else:
             if self.__v == 0:
                 return lose_value
             elif self.__w == 0:
                 return win_value
             else:
                 specie_value = self.__v / self.__w
-                dist_value = self.__vw_min[0] * f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
+                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
                 human_value = self.__wh_min[0] - self.__vh_min[0]
         return specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
     # END heuristic
