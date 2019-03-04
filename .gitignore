@@ -5,3 +5,5 @@
 
 # Config file
 kit_de_tests/interface_graphique/VampiresVSWerewolvesGameServer.exe.config
+
+*/__pycache__
