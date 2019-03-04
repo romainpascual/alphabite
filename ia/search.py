@@ -27,7 +27,7 @@ class IA(Thread):
         self.__my_species = species
         self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
 
-    def alphabeta(self, src_board, prev_move=None, depth=0, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
+    def alphabeta(self, src_board, depth=0, prev_move=None, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
         """
         Alphabeta AI to choose the best move to play
         :param src_board: Actual Board on which we apply Alphabeta
