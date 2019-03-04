@@ -4,6 +4,13 @@ class Move:
         self.__dest_cell = dest_cell  # Cell object
         self.__change = change  # Change object
 
+    def __str__(self):
+        src_x = self.__src_cell.x
+        src_y = self.__src_cell.y
+        dest_x = self.dest_cell.x
+        dest_y = self.dest_cell.y
+        return f"({src_x}, {src_y}) -> ({dest_x}, {dest_y})"
+
     @property
     def src_cell(self):
         return self.__src_cell

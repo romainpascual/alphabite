@@ -4,8 +4,9 @@ import struct
 
 
 class SocketConnector(Thread):
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, name='AlphaBite'):
         Thread.__init__(self)
+        self.name = name
         self.server_connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_connection.connect((ip, port))
         print('Connected')
@@ -32,9 +33,9 @@ class SocketConnector(Thread):
     def event(self):
         return self.__sendEvent
 
-    def launch_game(self, name='AlphaBite'):
+    def launch_game(self):
         # Sending name
-        self.server_connection.send(struct.pack('3s B 9s', b'NME', 9, name.encode()))
+        self.server_connection.send(struct.pack('3s B 9s', b'NME', 9, self.name.encode()))
         print('Sent name')
         self.connect_routine()
 

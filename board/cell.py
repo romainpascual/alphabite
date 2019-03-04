@@ -3,6 +3,7 @@
 # @class Cell
 
 # -- Third-party modules
+import math
 
 ##
 # @brief A tool for cell handling
@@ -35,6 +36,18 @@ class Cell:
         other_cell = Cell(self.x, self.y, self.species, self.group_size)
         return other_cell
     # END __copy__
+
+    def __eq__(self, other):
+        """
+        return self==other.
+        """
+        return (
+            self.__class__ == other.__class__
+            and self.__x == other.__x
+            and self.__y == other.__y
+            and self.__species == other.__species
+            and self.__group_size == other.__group_size
+        )
 
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
@@ -87,3 +100,20 @@ class Cell:
     def group_size(self, group_size):
         self.__group_size = group_size
     # END group_size
+
+    # ----------------------------------------------------------------------------
+    # -- AUX
+    # ----------------------------------------------------------------------------
+    
+    def dist_to(self, other):
+        """
+        Compute the distance between two cells.
+        The distance is computed as the number of moves for a group to go from a cell
+        to the other.
+        """
+        if not isinstance(other,Cell):
+            return
+        x_dist = abs(self.x - other.x)
+        y_dist = abs(self.y - other.y)
+        return max(x_dist, y_dist)
+    # END dist_to
