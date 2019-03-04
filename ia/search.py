@@ -10,7 +10,7 @@ import time
 
 
 class IA(Thread):
-    def __init__(self, src_board, max_depth=5):
+    def __init__(self, src_board, max_depth=10):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
@@ -88,7 +88,7 @@ class IA(Thread):
                 tic = time.time()
                 self.alphabeta(self.__src_board,
                                depth=0,
-                               move=None,
+                               prev_move=None,
                                isMaximizingPlayer=True,
                                alpha=-float('inf'),
                                beta=float('inf'),
