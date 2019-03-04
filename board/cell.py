@@ -21,8 +21,11 @@ class Cell:
         """
         self.__x = x
         self.__y = y
-        self.__species = species
         self.__group_size = group_size
+        if group_size == 0:
+            self.__species = None
+        else:
+            self.__species = species
     # END __init__
 
     def __copy__(self):
