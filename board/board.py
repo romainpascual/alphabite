@@ -93,7 +93,6 @@ class Board:
         new_board = copy(previous_board)
         for cell in cell_list:
             new_board.update_cell(cell)
-        # new_board.upd_win()
         return new_board
     # END create_from_board
 
@@ -195,7 +194,6 @@ class Board:
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
 
-        print(repr(self))
     # END update
 
     def update_cell(self, new_cell):
@@ -236,6 +234,13 @@ class Board:
     # ----------------------------------------------------------------------------
     # -- PLAYS
     # ----------------------------------------------------------------------------
+
+    @property
+    def is_winning_position(self):
+        if self.__v == 0 or self.__w == 0:
+            return True
+        else:
+            return False
 
     def heuristic(self, species):
         """
