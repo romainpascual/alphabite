@@ -264,8 +264,8 @@ class Board:
         min_dist = inf
         v = None
         w = None
-        for v_cell in self.__v_cells:
-            for w_cell in self.__w_cells:
+        for v_cell in self.v_cells:
+            for w_cell in self.w_cells:
                 d = v_cell.dist_to(w_cell)
                 if d < min_dist:
                     min_dist = d
@@ -281,9 +281,9 @@ class Board:
         min_dist = inf
         h = None
         s = None
-        s_cells = self.__v_cells if specie == 'v' else self.__w_cells
+        s_cells = self.v_cells if specie == 'v' else self.w_cells
         for s_cell in s_cells:
-            for h_cell in self.__h_cells:
+            for h_cell in self.h_cells:
                 d = s_cell.dist_to(h_cell)
                 if d < min_dist:
                     min_dist = d

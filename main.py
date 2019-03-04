@@ -8,8 +8,12 @@ if len(sys.argv) < 3:
 
 ip = sys.argv[-2]
 port = int(sys.argv[-1])
+if len(sys.argv) > 3:
+    name = sys.argv[-3]
+else:
+    name = 'AlphaBite'
 
-socket = SocketConnector(ip, port)
+socket = SocketConnector(ip, port, name)
 board = PlayingBoard()
 ia = IA(board)
 
