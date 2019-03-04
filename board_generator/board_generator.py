@@ -4,10 +4,10 @@ from .misc import comb
 
 
 class BoardGenerator:
-    def __init__(self, src_board, species):
+    def __init__(self, src_board, species, prev_move):
         self.__src_board = src_board
         self.__species = species
-        self.__move_generator = MoveGenerator(src_board, species)
+        self.__move_generator = MoveGenerator(src_board, species, prev_move)
 
     def get_all_possible_boards(self):
         possible_moves = self.__move_generator.get_all_possible_moves()
