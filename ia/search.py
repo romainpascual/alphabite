@@ -38,6 +38,7 @@ class IA(Thread):
         :param max_depth: Max propagation depth in graph
         :return: best_move
         """
+        victory = 0
 
         if depth == max_depth or src_board.is_winning_position:
             return src_board.heuristic(self.__my_species)
@@ -46,23 +47,29 @@ class IA(Thread):
             generator = BoardGenerator(src_board, self.__my_species, prev_move)
             best_val = -float('inf')
             for board_with_probability, move in generator.get_all_possible_boards():
+                if depth == 0 and self.__best_move is None:
+                    self.__best_move = move
                 board = board_with_probability[0]
                 p = board_with_probability[1]
                 if p != 1:
                     certitude = False
-                value, victory = p * self.alphabeta(board, depth + 1, move, False, alpha, beta, max_depth, certitude)
-                if certitude and victory:
+                value, victory = self.alphabeta(board, depth + 1, move, False, alpha, beta, max_depth, certitude)
+                if certitude and victory == 1:
                     value = float('inf')
-                if certitude and not victory:
+                elif certitude and victory == -1:
                     value = float('-inf')
+                else:
+                    value *= p
+                if depth==0:
+                    print(move, value, certitude)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
                 if beta <= best_val:
-                    return best_val
+                    return best_val, victory
                 alpha = max(alpha, best_val)
-            return best_val
+            return best_val, victory
 
         else:
             generator = BoardGenerator(src_board, self.__enemy_species, prev_move)
@@ -70,15 +77,23 @@ class IA(Thread):
             for board_with_probability, move in generator.get_all_possible_boards():
                 board = board_with_probability[0]
                 p = board_with_probability[1]
-                value = p * self.alphabeta(board, depth + 1, move, True, alpha, beta, max_depth)
+                if p != 1:
+                    certitude = False
+                value, victory = self.alphabeta(board, depth + 1, move, True, alpha, beta, max_depth, certitude)
+                if certitude and victory == 1:
+                    value = float('inf')
+                elif certitude and victory == -1:
+                    value = float('-inf')
+                else:
+                    value *= p
                 if value < best_val:
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
                 if best_val <= alpha:
-                    return best_val
+                    return best_val, victory
                 beta = min(beta, best_val)
-            return best_val
+            return best_val, victory
 
     def turn_off(self):
         self.__shouldRun = False
@@ -101,6 +116,7 @@ class IA(Thread):
                                max_depth=self.__max_depth)
                 print("Sending after {:.3f}s".format(time.time()-tic))
                 self.__send_mov([self.__best_move.parse_for_socket()])
+                self.__best_move = None
         print('IA is shutdown.', ' '*20)
 
     def set_send_mov(self, send_mov_func):
