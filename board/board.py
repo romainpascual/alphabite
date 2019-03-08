@@ -420,9 +420,9 @@ class Board:
 
         if species == "w":
             if self.__w == 0:
-                return lose_value
+                return lose_value, -1
             elif self.__v == 0:
-                return win_value
+                return win_value, 1
             else:
                 # we want to maximize the ratio of our specie over the other specie
                 specie_value = self.__w / self.__v
@@ -437,13 +437,13 @@ class Board:
         
         else:
             if self.__v == 0:
-                return lose_value
+                return lose_value, -1
             elif self.__w == 0:
-                return win_value
+                return win_value, 1
             else:
                 specie_value = self.__v / self.__w
                 dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
                 human_value = self.__wh_min[0] - self.__vh_min[0]
-        return specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
+        return specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human, 0
     # END heuristic
 

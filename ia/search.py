@@ -10,7 +10,7 @@ import time
 
 
 class IA(Thread):
-    def __init__(self, src_board, max_depth=10):
+    def __init__(self, src_board, max_depth=8):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
@@ -27,7 +27,7 @@ class IA(Thread):
         self.__my_species = species
         self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
 
-    def alphabeta(self, src_board, depth=0, prev_move=None, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5):
+    def alphabeta(self, src_board, depth=0, prev_move=None, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5, certitude=True):
         """
         Alphabeta AI to choose the best move to play
         :param src_board: Actual Board on which we apply Alphabeta
@@ -48,7 +48,13 @@ class IA(Thread):
             for board_with_probability, move in generator.get_all_possible_boards():
                 board = board_with_probability[0]
                 p = board_with_probability[1]
-                value = p * self.alphabeta(board, depth + 1, move, False, alpha, beta, max_depth)
+                if p != 1:
+                    certitude = False
+                value, victory = p * self.alphabeta(board, depth + 1, move, False, alpha, beta, max_depth, certitude)
+                if certitude and victory:
+                    value = float('inf')
+                if certitude and not victory:
+                    value = float('-inf')
                 if best_val < value:
                     best_val = value
                     if depth == 0:
