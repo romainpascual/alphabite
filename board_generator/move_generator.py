@@ -34,8 +34,10 @@ class MoveGenerator:
         board_height = self.__board.height
         x0 = src_cell.x
         y0 = src_cell.y
+        is_in_corner = (x0 == 0 and y0 == 0) or (x0 == 0 and y0 = board_height - 1) \
+            or (x0 == board_width - 1 and y0 == 0) or (x0 == board_width - 1 and y0 == board_height - 1)
 
-        if self.__prev_move:
+        if not is_in_corner and self.__prev_move:
             prev_cell = self.__prev_move.src_cell
             delta_x = x0 - prev_cell.x
             delta_y = y0 - prev_cell.y
