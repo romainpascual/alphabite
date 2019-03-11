@@ -433,7 +433,7 @@ class Board:
         else:
             return (6. * ratio * ratio - 25. * ratio + 19) / 5.
 
-    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=5):
+    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
