@@ -39,6 +39,7 @@ class IA(Thread):
         :return: best_move
         """
         victory = 0
+        best_board = None
 
         if depth == max_depth or src_board.is_winning_position:
             return src_board.heuristic(self.__my_species)
@@ -46,11 +47,10 @@ class IA(Thread):
         if isMaximizingPlayer:
             generator = BoardGenerator(src_board, self.__my_species, prev_move)
             best_val = -float('inf')
-            for board_with_probability, move in generator.get_all_possible_boards():
+            for (board, p), move in generator.get_all_possible_boards():
                 if depth == 0 and self.__best_move is None:
                     self.__best_move = move
-                board = board_with_probability[0]
-                p = board_with_probability[1]
+                    best_board = board
                 if p != 1:
                     certitude = False
                 value, victory = self.alphabeta(board, depth + 1, move, False, alpha, beta, max_depth, certitude)
@@ -60,11 +60,15 @@ class IA(Thread):
                     value = float('-inf')
                 else:
                     value *= p
-                if depth==0:
+                if depth == 0:
                     print(move, value, certitude)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
+                        self.__best_move = move
+                elif depth == 0 and best_val == value:
+                    if best_board.heuristic(self.__my_species) < board.heuristic(self.__my_species):
+                        best_board = board
                         self.__best_move = move
                 if beta <= best_val:
                     return best_val, victory
@@ -74,9 +78,7 @@ class IA(Thread):
         else:
             generator = BoardGenerator(src_board, self.__enemy_species, prev_move)
             best_val = float('inf')
-            for board_with_probability, move in generator.get_all_possible_boards():
-                board = board_with_probability[0]
-                p = board_with_probability[1]
+            for (board, p), move in generator.get_all_possible_boards():
                 if p != 1:
                     certitude = False
                 value, victory = self.alphabeta(board, depth + 1, move, True, alpha, beta, max_depth, certitude)
@@ -107,13 +109,14 @@ class IA(Thread):
         while self.__shouldRun:
             if self.event.wait(4.):
                 tic = time.time()
-                self.alphabeta(self.__src_board,
+                best_val = self.alphabeta(self.__src_board,
                                depth=0,
                                prev_move=None,
                                isMaximizingPlayer=True,
                                alpha=-float('inf'),
                                beta=float('inf'),
                                max_depth=self.__max_depth)
+                print(best_val)
                 print("Sending after {:.3f}s".format(time.time()-tic))
                 self.__send_mov([self.__best_move.parse_for_socket()])
                 self.__best_move = None
