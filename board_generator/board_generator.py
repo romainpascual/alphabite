@@ -98,26 +98,26 @@ class BoardGenerator:
     def get_random_battle_boards(self, src_cell, dest_cell, moving_group_size, p, attacker_is_winner):
         possible_boards = []  # Array of Board objects associated with a probability
         if attacker_is_winner:
-            for k in range(src_cell.group_size + 1):
-                new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
-                new_dest_cell = Cell(dest_cell.x, dest_cell.y, src_cell.species, k)
+            survivors = int(src_cell.group_size * p)
+            new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
+            new_dest_cell = Cell(dest_cell.x, dest_cell.y, src_cell.species, survivors)
 
-                new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dest_cell])
+            new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dest_cell])
 
-                # We use the binomial law to compute the probability of surviving
-                k_survivor_probability = Misc.p_binom(src_cell.group_size, k, p)
+            # We use the binomial law to compute the probability of surviving
+            # k_survivor_probability = Misc.p_binom(src_cell.group_size, k, p)
 
-                possible_boards.append((new_board, p * k_survivor_probability))
+            possible_boards.append((new_board, p))
         else:
-            for k in range(dest_cell.group_size + 1):
-                new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
-                new_dest_cell = Cell(dest_cell.x, dest_cell.y, dest_cell.species, k)
+            survivors = int(dest_cell.group_size * (1 - p))
+            new_src_cell = Cell(src_cell.x, src_cell.y, src_cell.species, src_cell.group_size - moving_group_size)
+            new_dest_cell = Cell(dest_cell.x, dest_cell.y, dest_cell.species, survivors)
 
-                new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dest_cell])
+            new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dest_cell])
 
-                # We use the binomial law to compute the probability of surviving
-                k_survivor_probability = Misc.p_binom(dest_cell.group_size, k, (1 - p))
+            # We use the binomial law to compute the probability of surviving
+            # k_survivor_probability = Misc.p_binom(dest_cell.group_size, k, (1 - p))
 
-                possible_boards.append((new_board, (1-p) * k_survivor_probability))
+            possible_boards.append((new_board, (1 - p)))
 
         return possible_boards
