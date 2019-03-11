@@ -1,6 +1,6 @@
 from board import Board, Cell
 from .move_generator import MoveGenerator
-from .misc import comb, p_binom
+from .misc import Misc
 
 
 class BoardGenerator:
@@ -105,7 +105,7 @@ class BoardGenerator:
                 new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dest_cell])
 
                 # We use the binomial law to compute the probability of surviving
-                k_survivor_probability = p_binom(src_cell.group_size, k, p)
+                k_survivor_probability = Misc.p_binom(src_cell.group_size, k, p)
 
                 possible_boards.append((new_board, p * k_survivor_probability))
         else:
@@ -116,7 +116,7 @@ class BoardGenerator:
                 new_board = Board.create_from_board(self.__src_board, [new_src_cell, new_dest_cell])
 
                 # We use the binomial law to compute the probability of surviving
-                k_survivor_probability = p_binom(dest_cell.group_size, k, (1 - p))
+                k_survivor_probability = Misc.p_binom(dest_cell.group_size, k, (1 - p))
 
                 possible_boards.append((new_board, (1-p) * k_survivor_probability))
 
