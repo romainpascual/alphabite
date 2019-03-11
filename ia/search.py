@@ -59,9 +59,9 @@ class IA(Thread):
                     certitude = False
                 value, victory = self.alphabeta(board, depth + 1, move, their_prev_move, False, alpha, beta, max_depth, certitude)
                 if certitude and victory == 1:
-                    value = float('inf')
+                    value = 100000
                 elif certitude and victory == -1:
-                    value = float('-inf')
+                    value = -100000
                 else:
                     value *= p
                 if depth == 0:
@@ -89,9 +89,9 @@ class IA(Thread):
                     certitude = False
                 value, victory = self.alphabeta(board, depth + 1, our_prev_move, move, True, alpha, beta, max_depth, certitude)
                 if certitude and victory == 1:
-                    value = float('inf')
+                    value = 100000
                 elif certitude and victory == -1:
-                    value = float('-inf')
+                    value = -100000
                 else:
                     value *= p
                 if value < best_val:
