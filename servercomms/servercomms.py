@@ -35,7 +35,7 @@ class SocketConnector(Thread):
 
     def launch_game(self):
         # Sending name
-        self.server_connection.send(struct.pack('3s B 9s', b'NME', 9, self.name.encode()))
+        self.server_connection.send(struct.pack('3s B {}s'.format(len(self.name)), b'NME', 9, self.name.encode()))
         print('Sent name')
         self.connect_routine()
 
