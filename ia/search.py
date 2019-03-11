@@ -7,6 +7,7 @@ Fourni un pseudo code et une explication extensive que j'ai utilisé pour ecrire
 from board_generator import BoardGenerator
 from threading import Thread
 import time
+from threading import Timer
 
 
 class IA(Thread):
@@ -105,10 +106,18 @@ class IA(Thread):
             time.sleep(1)
             t -= 1
 
+    def timeout_handler(self):
+        print("Timeout... Sending non-optimal best move")
+        self.__send_mov([self.__best_move.parse_for_socket()])
+        self.__best_move = None
+        self.run()
+
     def run(self):
         while self.__shouldRun:
             if self.event.wait(4.):
                 tic = time.time()
+                timer = Timer(2, self.timeout_handler)
+                timer.start()
                 best_val = self.alphabeta(self.__src_board,
                                depth=0,
                                prev_move=None,
@@ -116,6 +125,7 @@ class IA(Thread):
                                alpha=-float('inf'),
                                beta=float('inf'),
                                max_depth=self.__max_depth)
+                timer.cancel()
                 print(best_val)
                 print("Sending after {:.3f}s".format(time.time()-tic))
                 self.__send_mov([self.__best_move.parse_for_socket()])
