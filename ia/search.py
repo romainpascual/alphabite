@@ -11,7 +11,7 @@ from threading import Timer
 
 
 class IA(Thread):
-    def __init__(self, src_board, max_depth=8):
+    def __init__(self, src_board, max_depth=6):
         Thread.__init__(self)
         self.__src_board = src_board
         self.__best_move = None
