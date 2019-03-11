@@ -454,7 +454,7 @@ class Board:
                 return win_value, 1
             else:
                 # we want to maximize the ratio of our specie over the other specie
-                specie_value = (self.__w - self.__v)/self.__w
+                specie_value = (self.__w - self.__v)/(self.__w + self.__v)
 
                 # if the ratio is > 1, we want to minimze the distance
                 dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size)) / self.__size
@@ -472,7 +472,7 @@ class Board:
             elif self.__w == 0:
                 return win_value, 1
             else:
-                specie_value = (self.__v - self.__w)/self.__v
+                specie_value = (self.__v - self.__w)/(self.__w + self.__v)
                 dist_value = (self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))) / self.__size
                 human_value = (self.__wh_min[0] - self.__vh_min[0])/ self.__size
             
