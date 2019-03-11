@@ -38,6 +38,7 @@ class Board:
         # Attributs
         self.__X = x
         self.__Y = y
+        self.__size = (x+y)/2
         self._cells = dict()
         for i in range(self.__X):
             for j in range(self.__Y):
@@ -68,6 +69,7 @@ class Board:
         # Copy the attributes
         other_board.__X = self.__X
         other_board.__Y = self.__Y
+        other_board.__size == self.__size
         other_board._cells = self._cells.copy()
         other_board.__h = self.__h
         other_board.__v = self.__v
@@ -124,6 +126,13 @@ class Board:
         """
         return self.__Y
     # END height
+
+    @property
+    def size(self):
+        """
+        Get size of the board, used to get heuristic value independant from board size
+        """
+        return self.__size
 
     def get_cell(self, pos):
         """
@@ -254,33 +263,53 @@ class Board:
         """
         Compute the minimal distance between cell to cells of the given species
         Return dist, target_cell
+        
+        The way it is implemented, we can not have cell beeing human
         """
         target_cells = []
         if species == 'h':
             target_cells = self.h_cells
-        elif species == 'v':
-            target_cells = self.v_cells
-        elif species == 'w':
-            target_cells = self.w_cells
 
-        # handle empty cell list
-        if len(target_cells) == 0:
-            return inf, None
+            # handle empty cell list
+            if len(target_cells) == 0:
+                return inf, None
 
-        min_dist = inf
-        t = None
-        for t_cell in target_cells:
-                d = cell.dist_to(t_cell)
-                if d < min_dist:
-                    min_dist = d
-                    t = t_cell
-        return (min_dist, t)
+            min_dist = inf
+            t = None
+            for t_cell in target_cells:
+                    d = cell.dist_to(t_cell)
+                    if d < min_dist and t_cell.group_size <= cell.group_size:
+                        min_dist = d
+                        t = t_cell
+            return (min_dist, t)
+
+
+        else:
+            if species == 'v':
+                target_cells = self.v_cells
+            elif species == 'w':
+                target_cells = self.w_cells
+
+            # handle empty cell list
+            if len(target_cells) == 0:
+                return inf, None
+
+            min_dist = inf
+            t = None
+            for t_cell in target_cells:
+                    d = cell.dist_to(t_cell)
+                    if d < min_dist:
+                        min_dist = d
+                        t = t_cell
+            return (min_dist, t)
     # END min_distance_between_species
 
     def min_distance_species(self, source_species, target_species):
         """
         Compute the minimal distance between cells of two species
         Return dist, source_cell, target_cell
+
+        The way it is implemented, we can not have source_specie beeing human
         """
         if source_species == 'h':
             source_cells = self.h_cells
@@ -413,7 +442,7 @@ class Board:
         else:
             return (6. * ratio * ratio - 25. * ratio + 19) / 5.
 
-    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=1):
+    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=20, alpha_dist=1, alpha_human=10):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
@@ -425,15 +454,17 @@ class Board:
                 return win_value, 1
             else:
                 # we want to maximize the ratio of our specie over the other specie
-                specie_value = self.__w - self.__v
+                specie_value = (self.__w - self.__v)/(self.__w + self.__v)
 
                 # if the ratio is > 1, we want to minimze the distance
-                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
+                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size)) / self.__size
 
                 # we want to maximize the distance for between the other specie and a human cell
                 human_value = self.__vh_min[0]
                 # we want to minimize the distance between our species and a human cell
                 human_value -= self.__wh_min[0]
+                # turn in non dependant on the board size
+                human_value /= self.__size
         
         else:
             if self.__v == 0:
@@ -441,9 +472,13 @@ class Board:
             elif self.__w == 0:
                 return win_value, 1
             else:
-                specie_value = self.__v - self.__w
-                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
-                human_value = self.__wh_min[0] - self.__vh_min[0]
-        return specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human, 0
+                specie_value = (self.__v - self.__w)/(self.__w + self.__v)
+                dist_value = (self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))) / self.__size
+                human_value = (self.__wh_min[0] - self.__vh_min[0])/ self.__size
+            
+        #print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
+        output_value = specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
+        #print("output_value: {}".format(output_value))
+        return output_value, 0
     # END heuristic
 
