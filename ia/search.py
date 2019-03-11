@@ -70,7 +70,7 @@ class IA(Thread):
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
-                elif depth == 0 and best_val == value:
+                elif depth == 0 and best_val == value and p == 1:
                     if best_board.heuristic(self.__my_species) < board.heuristic(self.__my_species):
                         best_board = board
                         self.__best_move = move
@@ -124,7 +124,7 @@ class IA(Thread):
                 tic = time.time()
                 timer = Timer(2, self.timeout_handler)
                 timer.start()
-                self.alphabeta(self.__src_board,
+                best_val = self.alphabeta(self.__src_board,
                                depth=0,
                                prev_move=None,
                                isMaximizingPlayer=True,
@@ -133,7 +133,7 @@ class IA(Thread):
                                max_depth=self.__max_depth)
                 timer.cancel()
                 if not self.__hasTimedOut:
-                    print("Sending after {:.3f}s".format(time.time()-tic))
+                    print("Sending after {:.3f}s. Best val is {}".format(time.time()-tic, best_val))
                     self.__send_mov([self.__best_move.parse_for_socket()])
                 self.__best_move = None
         print('IA is shutdown.', ' '*20)
