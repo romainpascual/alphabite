@@ -20,6 +20,7 @@ class IA(Thread):
         self.__my_species = None
         self.__enemy_species = None
 
+        self.__hasTimedOut = False
         self.__shouldRun = True
 
         self.event = None  # TODO: better event handling to allow for calculation during opponent turn
@@ -49,6 +50,8 @@ class IA(Thread):
             generator = BoardGenerator(src_board, self.__my_species, prev_move)
             best_val = -float('inf')
             for (board, p), move in generator.get_all_possible_boards():
+                if self.__hasTimedOut:
+                    return float('-inf'), 0
                 if depth == 0 and self.__best_move is None:
                     self.__best_move = move
                     best_board = board
@@ -80,6 +83,8 @@ class IA(Thread):
             generator = BoardGenerator(src_board, self.__enemy_species, prev_move)
             best_val = float('inf')
             for (board, p), move in generator.get_all_possible_boards():
+                if self.__hasTimedOut:
+                    return float('-inf'), 0
                 if p != 1:
                     certitude = False
                 value, victory = self.alphabeta(board, depth + 1, move, True, alpha, beta, max_depth, certitude)
@@ -109,16 +114,17 @@ class IA(Thread):
     def timeout_handler(self):
         print("Timeout... Sending non-optimal best move")
         self.__send_mov([self.__best_move.parse_for_socket()])
+        self.__hasTimedOut = True
         self.__best_move = None
-        self.run()
 
     def run(self):
         while self.__shouldRun:
             if self.event.wait(4.):
+                self.__hasTimedOut = False
                 tic = time.time()
-                timer = Timer(2, self.timeout_handler)
+                timer = Timer(1, self.timeout_handler)
                 timer.start()
-                best_val = self.alphabeta(self.__src_board,
+                self.alphabeta(self.__src_board,
                                depth=0,
                                prev_move=None,
                                isMaximizingPlayer=True,
@@ -126,9 +132,9 @@ class IA(Thread):
                                beta=float('inf'),
                                max_depth=self.__max_depth)
                 timer.cancel()
-                print(best_val)
-                print("Sending after {:.3f}s".format(time.time()-tic))
-                self.__send_mov([self.__best_move.parse_for_socket()])
+                if not self.__hasTimedOut:
+                    print("Sending after {:.3f}s".format(time.time()-tic))
+                    self.__send_mov([self.__best_move.parse_for_socket()])
                 self.__best_move = None
         print('IA is shutdown.', ' '*20)
 
