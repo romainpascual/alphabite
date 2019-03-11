@@ -263,33 +263,53 @@ class Board:
         """
         Compute the minimal distance between cell to cells of the given species
         Return dist, target_cell
+        
+        The way it is implemented, we can not have cell beeing human
         """
         target_cells = []
         if species == 'h':
             target_cells = self.h_cells
-        elif species == 'v':
-            target_cells = self.v_cells
-        elif species == 'w':
-            target_cells = self.w_cells
 
-        # handle empty cell list
-        if len(target_cells) == 0:
-            return inf, None
+            # handle empty cell list
+            if len(target_cells) == 0:
+                return inf, None
 
-        min_dist = inf
-        t = None
-        for t_cell in target_cells:
-                d = cell.dist_to(t_cell)
-                if d < min_dist:
-                    min_dist = d
-                    t = t_cell
-        return (min_dist, t)
+            min_dist = inf
+            t = None
+            for t_cell in target_cells:
+                    d = cell.dist_to(t_cell)
+                    if d < min_dist and t_cell.group_size <= cell.group_size:
+                        min_dist = d
+                        t = t_cell
+            return (min_dist, t)
+
+
+        else:
+            if species == 'v':
+                target_cells = self.v_cells
+            elif species == 'w':
+                target_cells = self.w_cells
+
+            # handle empty cell list
+            if len(target_cells) == 0:
+                return inf, None
+
+            min_dist = inf
+            t = None
+            for t_cell in target_cells:
+                    d = cell.dist_to(t_cell)
+                    if d < min_dist:
+                        min_dist = d
+                        t = t_cell
+            return (min_dist, t)
     # END min_distance_between_species
 
     def min_distance_species(self, source_species, target_species):
         """
         Compute the minimal distance between cells of two species
         Return dist, source_cell, target_cell
+
+        The way it is implemented, we can not have source_specie beeing human
         """
         if source_species == 'h':
             source_cells = self.h_cells
