@@ -457,12 +457,14 @@ class Board:
                 specie_value = (self.__w - self.__v)/self.__w
 
                 # if the ratio is > 1, we want to minimze the distance
-                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
+                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size)) / self.__size
 
                 # we want to maximize the distance for between the other specie and a human cell
                 human_value = self.__vh_min[0]
                 # we want to minimize the distance between our species and a human cell
                 human_value -= self.__wh_min[0]
+                # turn in non dependant on the board size
+                human_value /= self.__size
         
         else:
             if self.__v == 0:
@@ -473,6 +475,7 @@ class Board:
                 specie_value = (self.__v - self.__w)/self.__v
                 dist_value = (self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))) / self.__size
                 human_value = (self.__wh_min[0] - self.__vh_min[0])/ self.__size
+            
         #print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
         output_value = specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
         #print("output_value: {}".format(output_value))
