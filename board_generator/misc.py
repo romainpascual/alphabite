@@ -3,20 +3,20 @@ from functools import reduce
 
 class Misc (object):
 
-    def __init__(self):
-        self.comb_hash = dict()
-        self.binom_hash = dict()
-    
-    def comb(self, n, k):
+    comb_hash = dict()
+    binom_hash = dict()
+
+    @staticmethod
+    def comb(n, k):
         k = min(k, n-k)
-        if (n,k) not in self.comb_hash.keys():
+        if (n,k) not in Misc.comb_hash.keys():
             numer = reduce(op.mul, range(n, n-k, -1), 1)
             denom = reduce(op.mul, range(1, k+1), 1)
-            self.comb_hash[(n,k)] = numer // denom
-        return self.comb_hash[(n,k)]
-            
+            Misc.comb_hash[(n,k)] = numer // denom
+        return Misc.comb_hash[(n,k)]
 
-    def p_binom(self, n, k, p):
-        if (n,k,p) not in self.binom_hash.keys():
-            self.binom_hash[(n,k,p)] = self.comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
-        return self.binom_hash[(n,k,p)]
+    @staticmethod
+    def p_binom(n, k, p):
+        if (n,k,p) not in Misc.binom_hash.keys():
+            Misc.binom_hash[(n,k,p)] = Misc.comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
+        return Misc.binom_hash[(n,k,p)]
