@@ -122,7 +122,7 @@ class IA(Thread):
             if self.event.wait(4.):
                 self.__hasTimedOut = False
                 tic = time.time()
-                timer = Timer(1, self.timeout_handler)
+                timer = Timer(2, self.timeout_handler)
                 timer.start()
                 self.alphabeta(self.__src_board,
                                depth=0,
