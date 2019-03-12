@@ -111,7 +111,8 @@ class IA(Thread):
                                             max_depth=max_depth,
                                             certitude=certitude)
 
-            # If the branch leads to a sure win, give a huge value to the value
+            # If the branch leads to a sure win/loss, give a huge value to the best_value
+            # This is only possible at the node directly before the win/loss
             if certitude and victory == 1:
                 value = SURE_WIN
             elif certitude and victory == -1:
@@ -144,7 +145,7 @@ class IA(Thread):
                 elif best_val < value:
                     best_val = value
                 if beta <= best_val:
-                    return best_val, victory
+                    return best_val, 0
                 alpha = max(alpha, best_val)
 
             # Min node
@@ -152,10 +153,10 @@ class IA(Thread):
                 if value < best_val:
                     best_val = value
                 if best_val <= alpha:
-                    return best_val, victory
+                    return best_val, 0
                 beta = min(beta, best_val)
 
-        return best_val, victory
+        return best_val, 0
 
     def turn_off(self):
         self.__shouldRun = False
