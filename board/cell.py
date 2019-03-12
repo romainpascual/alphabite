@@ -75,8 +75,11 @@ class Cell:
         """
         return not self < other
 
-    def __repr__(self):
+    def __str__(self):
         return "[Cell = ({},{}), specie is {}, group size = {}]".format(self.x, self.y, self.species, self.group_size)
+
+    def __hash__(self):
+        return hash((self.__x, self.__y))
 
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
