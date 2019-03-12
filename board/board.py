@@ -179,6 +179,15 @@ class Board:
         """
         return [copy(cell) for cell in self.__w_cells.values()]
     # END w_cells
+
+    def get_species_population(self, species):
+        """
+        Return the population of the given species
+        """
+        if species == 'v':
+            return self.vampires
+        elif species == 'w':
+            return self.werewolves
     
     def get_cells(self, species):
         """
