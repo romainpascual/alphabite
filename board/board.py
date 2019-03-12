@@ -441,7 +441,7 @@ class Board:
             elif dist == d:
                 if species == 'v':
                     species = None
-                cells.add(v_cell)
+                cells.add(w_cell)
         return d, species, cells
     # END closest_playing_cell
 
@@ -470,7 +470,7 @@ class Board:
                 if cell in voronoi_value[2]:
                     if len(voronoi_value[2]) == 1:
                         self.__voronoi[h_cell] = self.closest_specie(h_cell)
-                    else:
+                    elif len(voronoi_value[2]) > 1 :
                         cells = copy(voronoi_value[2])
                         cells.remove(cell)
                         for c in cells:
