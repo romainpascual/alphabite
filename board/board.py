@@ -247,8 +247,7 @@ class Board:
             self.__w_cells.pop((x, y), None)
         if Board.HEURISTIC_VORONOI:
             self.delete_cell_upd_voronoi(old_cell)
-        else:
-            self.delete_cell_update_dist(old_cell)
+        self.delete_cell_update_dist(old_cell)
         
         # process the new cell
         if new_cell.species == 'h':
@@ -262,8 +261,7 @@ class Board:
             self.__w_cells[(x, y)] = new_cell
         if Board.HEURISTIC_VORONOI:
             self.create_cell_upd_voronoi(new_cell)
-        else:
-            self.create_cell_update_dist(new_cell)
+        self.create_cell_update_dist(new_cell)
 
         self._cells[(x, y)] = new_cell
     # END update_cell
