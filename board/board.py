@@ -24,6 +24,8 @@ class Board:
     SUCCESS = 0
     FAILURE = 1
 
+    HEURISTIC_VORONOI = True
+
     # ----------------------------------------------------------------------------
     # -- DEFAULT FUNCTIONS
     # ----------------------------------------------------------------------------
@@ -243,8 +245,10 @@ class Board:
         elif old_cell.species == 'w':
             self.__w -= old_cell.group_size
             self.__w_cells.pop((x, y), None)
-        self.delete_cell_upd_voronoi(old_cell)
-        self.delete_cell_update_dist(old_cell)
+        if Board.HEURISTIC_VORONOI:
+            self.delete_cell_upd_voronoi(old_cell)
+        else:
+            self.delete_cell_update_dist(old_cell)
         
         # process the new cell
         if new_cell.species == 'h':
@@ -256,8 +260,10 @@ class Board:
         elif new_cell.species == 'w':
             self.__w += new_cell.group_size
             self.__w_cells[(x, y)] = new_cell
-        self.create_cell_update_dist(new_cell)
-        self.create_cell_upd_voronoi(new_cell)
+        if Board.HEURISTIC_VORONOI:
+            self.create_cell_upd_voronoi(new_cell)
+        else:
+            self.create_cell_update_dist(new_cell)
 
         self._cells[(x, y)] = new_cell
     # END update_cell
@@ -517,7 +523,7 @@ class Board:
         else:
             return (6. * ratio * ratio - 25. * ratio + 19) / 5.
 
-    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
+    def heuristic_distance(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
@@ -561,7 +567,7 @@ class Board:
                                                                                         else human_value)
         # print("output_value: {}".format(output_value))
         return output_value, 0
-    # END heuristic
+    # END heuristic_distance
 
     def heuristic_voronoi(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
         """
@@ -608,3 +614,9 @@ class Board:
         # print("output_value: {}".format(output_value))
         return output_value, 0
     # END heuristic_voronoi
+
+    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
+        if Board.HEURISTIC_VORONOI:
+            return self.heuristic_voronoi(species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4)
+        else:
+            return self.heuristic_distance(species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4)
