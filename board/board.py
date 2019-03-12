@@ -224,8 +224,6 @@ class Board:
         old_cell = self._cells[(x, y)]
 
         # process the previous cell
-        self.delete_cell_update_dist(old_cell)
-        self.delete_cell_upd_voronoi(old_cell)
         if old_cell.species == 'h':
             self.__h -= old_cell.group_size
             self.__h_cells.pop((x,y), None)
@@ -235,10 +233,10 @@ class Board:
         elif old_cell.species == 'w':
             self.__w -= old_cell.group_size
             self.__w_cells.pop((x,y), None)
+        self.delete_cell_upd_voronoi(old_cell)
+        self.delete_cell_update_dist(old_cell)
         
         # process the new cell
-        self.create_cell_update_dist(new_cell)
-        self.create_cell_upd_voronoi(new_cell)
         if new_cell.species == 'h':
             self.__h += new_cell.group_size
             self.__h_cells[(x,y)] = new_cell
@@ -248,6 +246,8 @@ class Board:
         elif new_cell.species == 'w':
             self.__w += new_cell.group_size
             self.__w_cells[(x,y)] = new_cell
+        self.create_cell_update_dist(new_cell)
+        self.create_cell_upd_voronoi(new_cell)
 
         self._cells[(x, y)] = new_cell
     # END update_cell
@@ -418,18 +418,24 @@ class Board:
     def closest_specie(self, human_cell):
         if human_cell.species != 'h':
             raise ValueError('Not a human cell')
-
         d = inf
-        cell = None
+        species = None
+        cells = None
         for v_cell in self.v_cells:
             dist = human_cell.dist_to(v_cell)
             if dist < d:
-                dist, cell = d, v_cell
+                dist, species, cells = d, 'v', set(v_cell)
+            elif dist == d:
+                cells.add(v_cell)
         for w_cell in self.w_cells:
             dist = human_cell.dist_to(w_cell)
             if dist < d:
-                dist, cell = d, w_cell
-        return (d,cell)
+                dist, species, cells = d, 'w', set(w_cell)
+            elif dist == d:
+                if species == 'v':
+                    species = None
+                cells.add(v_cell)
+        return (d, species, cells)
     # END closest_playing_cell
 
     def create_cell_upd_voronoi(self, cell):
@@ -439,7 +445,14 @@ class Board:
             for h_cell, voronoi_value in self.__voronoi.items():
                 d = h_cell.dist_to(cell)
                 if voronoi_value[0] > d:
-                    self.__voronoi[h_cell] = (d,cell)
+                    self.__voronoi[h_cell] = (d,cell.species, set(cell))
+                elif voronoi_value[0] == d:
+                    species = voronoi_value[1]
+                    if voronoi_value[1] != cell.species:
+                        species = None
+                    cells = copy(voronoi_value[2])
+                    cells.add(cell)
+                    self.__voronoi[h_cell] = (d, species, cells)
     # END create_cell_upd_voronoi
 
     def delete_cell_upd_voronoi(self, cell):
@@ -447,14 +460,25 @@ class Board:
             self.__voronoi.pop(cell,None)
         elif cell.species == 'v' or cell.species == 'w':
             for h_cell, voronoi_value in self.__voronoi.items():
-                if voronoi_value[1] == cell:
-                    self.__voronoi[h_cell] = self.closest_specie(h_cell)
+                if cell in voronoi_value[2]:
+                    if len(voronoi_value[2]) == 1:
+                        self.__voronoi[h_cell] = self.closest_specie(h_cell)
+                    else:
+                        cells = copy(voronoi_value[2])
+                        cells.remove(cell)
+                        for c in cells:
+                            break
+                        species = c.species
+                        for c in cells:
+                            if species != c.species:
+                                species = None
+                        self.__voronoi[h_cell] = (voronoi_value[0], species, cells)           
     # END delete_cell_upd_voronoi
 
     def voronoi_value(self, species):
         value = 0
         for h_cell, voronoi_value in self.__voronoi.items():
-            if voronoi_value[1].species == species:
+            if voronoi_value[1] is not None and voronoi_value[1] == species:
                 value += h_cell.group_size
         return value
     # END voronoi_value
