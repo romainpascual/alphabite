@@ -53,6 +53,8 @@ class Board:
         self.__wh_min = (inf, None, None)
         self.__vw_min = (inf, None, None)
 
+        self.__voronoi = dict()
+
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
@@ -78,6 +80,7 @@ class Board:
         other_board.__vh_min = self.__vh_min
         other_board.__wh_min = self.__wh_min
         other_board.__vw_min = self.__vw_min
+        other_board.__voronoi = self.__voronoi
 
         return other_board
     # END __copy__
@@ -222,6 +225,7 @@ class Board:
 
         # process the previous cell
         self.delete_cell_update_dist(old_cell)
+        self.delete_cell_upd_voronoi(old_cell)
         if old_cell.species == 'h':
             self.__h -= old_cell.group_size
             self.__h_cells.pop((x,y), None)
@@ -234,6 +238,7 @@ class Board:
         
         # process the new cell
         self.create_cell_update_dist(new_cell)
+        self.create_cell_upd_voronoi(new_cell)
         if new_cell.species == 'h':
             self.__h += new_cell.group_size
             self.__h_cells[(x,y)] = new_cell
@@ -406,6 +411,55 @@ class Board:
                 self.__vw_min = (to_vampire[0], to_vampire[1], cell)
     # END create_cell_update_dist
 
+
+    # ----------------------------------------------------------------------------
+    # -- VORONOI
+    # ----------------------------------------------------------------------------
+    def closest_specie(self, human_cell):
+        if human_cell.species != 'h':
+            raise ValueError('Not a human cell')
+
+        d = inf
+        cell = None
+        for v_cell in self.v_cells:
+            dist = human_cell.dist_to(v_cell)
+            if dist < d:
+                dist, cell = d, v_cell
+        for w_cell in self.w_cells:
+            dist = human_cell.dist_to(w_cell)
+            if dist < d:
+                dist, cell = d, w_cell
+        return (d,cell)
+    # END closest_playing_cell
+
+    def create_cell_upd_voronoi(self, cell):
+        if cell.species == 'h':
+            self.__voronoi[cell] = self.closest_specie(cell)
+        elif cell.species == 'v' or cell.species == 'w':
+            for h_cell, voronoi_value in self.__voronoi.items():
+                d = h_cell.dist_to(cell)
+                if voronoi_value[0] > d:
+                    self.__voronoi[h_cell] = (d,cell)
+    # END create_cell_upd_voronoi
+
+    def delete_cell_upd_voronoi(self, cell):
+        if cell.species == 'h':
+            self.__voronoi.pop(cell,None)
+        elif cell.species == 'v' or cell.species == 'w':
+            for h_cell, voronoi_value in self.__voronoi.items():
+                if voronoi_value[1] == cell:
+                    self.__voronoi[h_cell] = self.closest_specie(h_cell)
+    # END delete_cell_upd_voronoi
+
+    def voronoi_value(self, species):
+        value = 0
+        for h_cell, voronoi_value in self.__voronoi.items():
+            if voronoi_value[1].species == species:
+                value += h_cell.group_size
+        return value
+    # END voronoi_value
+
+
     # ----------------------------------------------------------------------------
     # -- PLAYS
     # ----------------------------------------------------------------------------
@@ -473,3 +527,42 @@ class Board:
         return output_value, 0
     # END heuristic
 
+    def heuristic_voronoi(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
+        """
+        Return the heuristic value of the board, assuming max player is playing species
+        """
+
+        if species == "w":
+            if self.__w == 0:
+                return lose_value, -1
+            elif self.__v == 0:
+                return win_value, 1
+            else:
+                # we want to maximize the ratio of our specie over the other specie
+                specie_value = (self.__w - self.__v)/(self.__w + self.__v)
+
+                # if the ratio is > 1, we want to minimze the distance
+                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size)) / ((self.__X + self.__Y)/2)
+
+                # we want to maximize our voronoi cells over the other specie
+                voronoi_v = self.voronoi_value('v')
+                voronoi_w = self.voronoi_value('w')
+                human_value = (voronoi_w - voronoi_v)/(voronoi_w + voronoi_v)
+        
+        else:
+            if self.__v == 0:
+                return lose_value, -1
+            elif self.__w == 0:
+                return win_value, 1
+            else:
+                specie_value = (self.__v - self.__w)/(self.__w + self.__v)
+                dist_value = (self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))) / ((self.__X + self.__Y)/2)
+                voronoi_v = self.voronoi_value('v')
+                voronoi_w = self.voronoi_value('w')
+                human_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
+            
+        #print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
+        output_value = specie_value*alpha_specie + dist_value*alpha_dist + (0 if isnan(human_value) else human_value)*alpha_human
+        #print("output_value: {}".format(output_value))
+        return output_value, 0
+    # END heuristic_voronoi
