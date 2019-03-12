@@ -431,24 +431,22 @@ class Board:
     def closest_specie(self, human_cell):
         if human_cell.species != 'h':
             raise ValueError('Not a human cell')
-        d = inf
-        species = None
-        cells = None
+        d, species, cells = inf, None, None
         for v_cell in self.v_cells:
             dist = human_cell.dist_to(v_cell)
             if dist < d:
-                dist, species, cells = d, 'v', {v_cell}
+                d, species, cells = dist, 'v', {v_cell}
             elif dist == d:
                 cells.add(v_cell)
         for w_cell in self.w_cells:
             dist = human_cell.dist_to(w_cell)
             if dist < d:
-                dist, species, cells = d, 'w', {w_cell}
+                d, species, cells = dist, 'w', {w_cell}
             elif dist == d:
                 if species == 'v':
                     species = None
                 cells.add(w_cell)
-        return d, species, cells
+        return (d, species, cells)
     # END closest_playing_cell
 
     def create_cell_upd_voronoi(self, cell):
@@ -456,16 +454,16 @@ class Board:
             self.__voronoi[cell] = self.closest_specie(cell)
         elif cell.species == 'v' or cell.species == 'w':
             for h_cell, voronoi_value in self.__voronoi.items():
-                d = h_cell.dist_to(cell)
-                if voronoi_value[0] > d:
-                    self.__voronoi[h_cell] = (d, cell.species, {cell})
-                elif voronoi_value[0] == d:
+                dist = h_cell.dist_to(cell)
+                if dist < voronoi_value[0]:
+                    self.__voronoi[h_cell] = (dist, cell.species, {cell})
+                elif dist == voronoi_value[0]:
                     species = voronoi_value[1]
                     if voronoi_value[1] != cell.species:
                         species = None
                     cells = copy(voronoi_value[2])
                     cells.add(cell)
-                    self.__voronoi[h_cell] = (d, species, cells)
+                    self.__voronoi[h_cell] = (dist, species, cells)
     # END create_cell_upd_voronoi
 
     def delete_cell_upd_voronoi(self, cell):
@@ -591,7 +589,10 @@ class Board:
                 # we want to maximize our voronoi cells over the other specie
                 voronoi_v = self.voronoi_value('v')
                 voronoi_w = self.voronoi_value('w')
-                human_value = (voronoi_w - voronoi_v)/(voronoi_w + voronoi_v)
+                if voronoi_v == 0 and voronoi_w == 0:
+                    human_value = 0
+                else:
+                    human_value = (voronoi_w - voronoi_v)/(voronoi_w + voronoi_v)
         
         else:
             if self.__v == 0:
@@ -605,7 +606,10 @@ class Board:
                               ) / ((self.__X + self.__Y)/2)
                 voronoi_v = self.voronoi_value('v')
                 voronoi_w = self.voronoi_value('w')
-                human_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
+                if voronoi_v == 0 and voronoi_w == 0:
+                    human_value = 0
+                else:
+                    human_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
             
         # print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
         output_value = specie_value*alpha_specie + dist_value*alpha_dist + alpha_human*(0
