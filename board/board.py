@@ -7,7 +7,7 @@
 # -- Program modules
 from .cell import Cell
 from copy import copy
-from math import inf
+from math import inf, isnan
 
 ##
 # @brief A tool for board simulation
@@ -433,7 +433,7 @@ class Board:
         else:
             return (6. * ratio * ratio - 25. * ratio + 19) / 5.
 
-    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=5):
+    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
@@ -468,7 +468,7 @@ class Board:
                 human_value = (self.__wh_min[0] - self.__vh_min[0])/ ((self.__X + self.__Y)/2)
             
         #print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
-        output_value = specie_value*alpha_specie + dist_value*alpha_dist + human_value*alpha_human
+        output_value = specie_value*alpha_specie + dist_value*alpha_dist + (0 if isnan(human_value) else human_value)*alpha_human
         #print("output_value: {}".format(output_value))
         return output_value, 0
     # END heuristic

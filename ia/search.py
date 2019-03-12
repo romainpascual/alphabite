@@ -29,7 +29,7 @@ class IA(Thread):
         self.__my_species = species
         self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
 
-    def alphabeta(self, src_board, depth=0, prev_move=None, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=5, certitude=True):
+    def alphabeta(self, src_board, depth=0, our_prev_move=None, their_prev_move = None, isMaximizingPlayer=True, alpha=-float('inf'), beta=float('inf'), max_depth=6, certitude=True):
         """
         Alphabeta AI to choose the best move to play
         :param src_board: Actual Board on which we apply Alphabeta
@@ -47,8 +47,8 @@ class IA(Thread):
             return src_board.heuristic(self.__my_species)
 
         if isMaximizingPlayer:
-            generator = BoardGenerator(src_board, self.__my_species, prev_move)
-            best_val = -float('inf')
+            generator = BoardGenerator(src_board, self.__my_species, our_prev_move)
+            best_val = float('-inf')
             for (board, p), move in generator.get_all_possible_boards():
                 if self.__hasTimedOut:
                     return float('-inf'), 0
@@ -57,20 +57,20 @@ class IA(Thread):
                     best_board = board
                 if p != 1:
                     certitude = False
-                value, victory = self.alphabeta(board, depth + 1, move, False, alpha, beta, max_depth, certitude)
+                value, victory = self.alphabeta(board, depth + 1, move, their_prev_move, False, alpha, beta, max_depth, certitude)
                 if certitude and victory == 1:
-                    value = float('inf')
+                    value = 100000
                 elif certitude and victory == -1:
-                    value = float('-inf')
+                    value = -100000
                 else:
                     value *= p
                 if depth == 0:
-                    print(move, value, certitude)
+                    print(move, value, certitude, p)
                 if best_val < value:
                     best_val = value
                     if depth == 0:
                         self.__best_move = move
-                elif depth == 0 and best_val == value:
+                elif depth == 0 and best_val == value and p == 1:
                     if best_board.heuristic(self.__my_species) < board.heuristic(self.__my_species):
                         best_board = board
                         self.__best_move = move
@@ -80,24 +80,22 @@ class IA(Thread):
             return best_val, victory
 
         else:
-            generator = BoardGenerator(src_board, self.__enemy_species, prev_move)
+            generator = BoardGenerator(src_board, self.__enemy_species, their_prev_move)
             best_val = float('inf')
             for (board, p), move in generator.get_all_possible_boards():
                 if self.__hasTimedOut:
                     return float('-inf'), 0
                 if p != 1:
                     certitude = False
-                value, victory = self.alphabeta(board, depth + 1, move, True, alpha, beta, max_depth, certitude)
+                value, victory = self.alphabeta(board, depth + 1, our_prev_move, move, True, alpha, beta, max_depth, certitude)
                 if certitude and victory == 1:
-                    value = float('inf')
+                    value = 100000
                 elif certitude and victory == -1:
-                    value = float('-inf')
+                    value = -100000
                 else:
                     value *= p
                 if value < best_val:
                     best_val = value
-                    if depth == 0:
-                        self.__best_move = move
                 if best_val <= alpha:
                     return best_val, victory
                 beta = min(beta, best_val)
@@ -124,16 +122,17 @@ class IA(Thread):
                 tic = time.time()
                 timer = Timer(2, self.timeout_handler)
                 timer.start()
-                self.alphabeta(self.__src_board,
-                               depth=0,
-                               prev_move=None,
-                               isMaximizingPlayer=True,
-                               alpha=-float('inf'),
-                               beta=float('inf'),
-                               max_depth=self.__max_depth)
+                best_val = self.alphabeta(self.__src_board,
+                                          depth=0,
+                                          our_prev_move=None,
+                                          their_prev_move=None,
+                                          isMaximizingPlayer=True,
+                                          alpha=-float('inf'),
+                                          beta=float('inf'),
+                                          max_depth=self.__max_depth)
                 timer.cancel()
                 if not self.__hasTimedOut:
-                    print("Sending after {:.3f}s".format(time.time()-tic))
+                    print("Sending after {:.3f}s. Best val is {}".format(time.time()-tic, best_val))
                     self.__send_mov([self.__best_move.parse_for_socket()])
                 self.__best_move = None
         print('IA is shutdown.', ' '*20)
