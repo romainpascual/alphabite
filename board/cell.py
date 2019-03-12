@@ -49,6 +49,35 @@ class Cell:
             and self.__group_size == other.__group_size
         )
 
+    def __lt__(self, other):
+        """
+        return self < other.
+        """
+        return (self.__x < other.__x
+            or (self.__x == other.__x and self.__y < other.__y)
+        )
+
+    def __le__(self, other):
+        """
+        return self <= other
+        """
+        return self == other or self < other
+    
+    def __gt__(self, other):
+        """
+        return self > other
+        """
+        return not self <= other
+
+    def __ge__(self, other):
+        """
+        return self >= other
+        """
+        return not self < other
+
+    def __repr__(self):
+        return "[Cell = ({},{}), specie is {}, group size = {}]".format(self.x, self.y, self.species, self.group_size)
+
     # ----------------------------------------------------------------------------
     # -- GETTERS AND SETTERS
     # ----------------------------------------------------------------------------
