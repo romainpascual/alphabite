@@ -13,6 +13,7 @@ from math import inf, isnan
 # @brief A tool for board simulation
 #
 
+
 class Board:
     
     # ----------------------------------------------------------------------------
@@ -216,8 +217,8 @@ class Board:
         self.__err_msg = "Board.update()"
 
         for up in upd:
-            newCell = Cell(up[0], up[1], up[2][0], up[2][1])
-            self.update_cell(newCell)
+            new_cell = Cell(up[0], up[1], up[2][0], up[2][1])
+            self.update_cell(new_cell)
 
         # -- Errors
         self.__err_code = Board.SUCCESS
@@ -229,32 +230,32 @@ class Board:
         Update cell content
         """
         x = new_cell.x
-        y =  new_cell.y
+        y = new_cell.y
         old_cell = self._cells[(x, y)]
 
         # process the previous cell
         if old_cell.species == 'h':
             self.__h -= old_cell.group_size
-            self.__h_cells.pop((x,y), None)
+            self.__h_cells.pop((x, y), None)
         elif old_cell.species == 'v':
             self.__v -= old_cell.group_size
-            self.__v_cells.pop((x,y), None)
+            self.__v_cells.pop((x, y), None)
         elif old_cell.species == 'w':
             self.__w -= old_cell.group_size
-            self.__w_cells.pop((x,y), None)
+            self.__w_cells.pop((x, y), None)
         self.delete_cell_upd_voronoi(old_cell)
         self.delete_cell_update_dist(old_cell)
         
         # process the new cell
         if new_cell.species == 'h':
             self.__h += new_cell.group_size
-            self.__h_cells[(x,y)] = new_cell
+            self.__h_cells[(x, y)] = new_cell
         elif new_cell.species == 'v':
             self.__v += new_cell.group_size
-            self.__v_cells[(x,y)] = new_cell
+            self.__v_cells[(x, y)] = new_cell
         elif new_cell.species == 'w':
             self.__w += new_cell.group_size
-            self.__w_cells[(x,y)] = new_cell
+            self.__w_cells[(x, y)] = new_cell
         self.create_cell_update_dist(new_cell)
         self.create_cell_upd_voronoi(new_cell)
 
@@ -286,8 +287,7 @@ class Board:
                     if d < min_dist and t_cell.group_size <= cell.group_size:
                         min_dist = d
                         t = t_cell
-            return (min_dist, t)
-
+            return min_dist, t
 
         else:
             if species == 'v':
@@ -306,7 +306,7 @@ class Board:
                     if d < min_dist:
                         min_dist = d
                         t = t_cell
-            return (min_dist, t)
+            return min_dist, t
     # END min_distance_between_species
 
     def min_distance_species(self, source_species, target_species):
@@ -320,7 +320,7 @@ class Board:
             source_cells = self.h_cells
         elif source_species == 'v':
             source_cells = self.v_cells
-        elif source_species == 'w':
+        else:
             source_cells = self.w_cells
 
         # handle empty cell list
@@ -334,9 +334,8 @@ class Board:
                 d, t_cell = self.min_distance_from_to(s_cell, target_species)
                 if d < min_dist:
                     min_dist, s, t = d, s_cell, t_cell
-        return (min_dist, s, t)
+        return min_dist, s, t
     # END min_distance_species
-
 
     def delete_cell_update_dist(self, cell):
         """
@@ -347,33 +346,33 @@ class Board:
 
             # vampires
             if self.__vh_min[2] == cell:
-                self.__vh_min = self.min_distance_species('v','h')
+                self.__vh_min = self.min_distance_species('v', 'h')
 
-            # werewolvev
+            # werewolves
             if self.__wh_min[2] == cell:
-                self.__wh_min = self.min_distance_species('w','h')
+                self.__wh_min = self.min_distance_species('w', 'h')
 
         # vampires
         elif cell.species == 'v':
 
             # humans
             if self.__vh_min[1] == cell:
-                self.__vh_min = self.min_distance_species('v','h')
+                self.__vh_min = self.min_distance_species('v', 'h')
 
             # werewolves
             if self.__vw_min[1] == cell:
-                self.__vw_min = self.min_distance_species('v','w')
+                self.__vw_min = self.min_distance_species('v', 'w')
 
         # werewolves
         elif cell.species == 'w':
 
             # humans
             if self.__wh_min[1] == cell:
-                self.__wh_min = self.min_distance_species('w','h')
+                self.__wh_min = self.min_distance_species('w', 'h')
 
             # vampires
             if self.__vw_min[2] == cell:
-                self.__vw_min = self.min_distance_species('v','w')
+                self.__vw_min = self.min_distance_species('v', 'w')
     # END delete_cell_update_dist
 
     def create_cell_update_dist(self, cell):
@@ -384,12 +383,12 @@ class Board:
         if cell.species == 'h':
 
             # vampires
-            to_vampire = self.min_distance_from_to(cell,'v')
+            to_vampire = self.min_distance_from_to(cell, 'v')
             if self.__vh_min[0] > to_vampire[0]:
                 self.__vh_min = (to_vampire[0], to_vampire[1], cell)
 
             # werewolves
-            to_werewolf = self.min_distance_from_to(cell,'w')
+            to_werewolf = self.min_distance_from_to(cell, 'w')
             if self.__wh_min[0] > to_werewolf[0]:
                 self.__wh_min = (to_werewolf[0], to_werewolf[1], cell)
 
@@ -397,12 +396,12 @@ class Board:
         elif cell.species == 'v':
 
             # humans
-            to_human = self.min_distance_from_to(cell,'h')
+            to_human = self.min_distance_from_to(cell, 'h')
             if self.__vh_min[0] > to_human[0]:
                 self.__vh_min = (to_human[0], cell, to_human[1])
 
             # werewolves
-            to_werewolf = self.min_distance_from_to(cell,'w')
+            to_werewolf = self.min_distance_from_to(cell, 'w')
             if self.__vw_min[0] > to_werewolf[0]:
                 self.__vw_min = (to_werewolf[0], cell, to_werewolf[1])
 
@@ -410,16 +409,15 @@ class Board:
         elif cell.species == 'w':
 
             # humans
-            to_human = self.min_distance_from_to(cell,'h')
+            to_human = self.min_distance_from_to(cell, 'h')
             if self.__wh_min[0] > to_human[0]:
                 self.__wh_min = (to_human[0], cell, to_human[1])
 
             # vampire
-            to_vampire = self.min_distance_from_to(cell,'v')
+            to_vampire = self.min_distance_from_to(cell, 'v')
             if self.__vw_min[0] > to_vampire[0]:
                 self.__vw_min = (to_vampire[0], to_vampire[1], cell)
     # END create_cell_update_dist
-
 
     # ----------------------------------------------------------------------------
     # -- VORONOI
@@ -444,7 +442,7 @@ class Board:
                 if species == 'v':
                     species = None
                 cells.add(v_cell)
-        return (d, species, cells)
+        return d, species, cells
     # END closest_playing_cell
 
     def create_cell_upd_voronoi(self, cell):
@@ -454,7 +452,7 @@ class Board:
             for h_cell, voronoi_value in self.__voronoi.items():
                 d = h_cell.dist_to(cell)
                 if voronoi_value[0] > d:
-                    self.__voronoi[h_cell] = (d,cell.species, set(cell))
+                    self.__voronoi[h_cell] = (d, cell.species, set(cell))
                 elif voronoi_value[0] == d:
                     species = voronoi_value[1]
                     if voronoi_value[1] != cell.species:
@@ -466,7 +464,7 @@ class Board:
 
     def delete_cell_upd_voronoi(self, cell):
         if cell.species == 'h':
-            self.__voronoi.pop(cell,None)
+            self.__voronoi.pop(cell, None)
         elif cell.species == 'v' or cell.species == 'w':
             for h_cell, voronoi_value in self.__voronoi.items():
                 if cell in voronoi_value[2]:
@@ -491,7 +489,6 @@ class Board:
                 value += h_cell.group_size
         return value
     # END voronoi_value
-
 
     # ----------------------------------------------------------------------------
     # -- PLAYS
@@ -535,7 +532,9 @@ class Board:
                 specie_value = (self.__w - self.__v)/(self.__w + self.__v)
 
                 # if the ratio is > 1, we want to minimze the distance
-                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size)) / ((self.__X + self.__Y)/2)
+                dist_value = (self.__vw_min[0] *
+                              self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
+                              ) / ((self.__X + self.__Y)/2)
 
                 # we want to maximize the distance for between the other specie and a human cell
                 human_value = self.__vh_min[0]
@@ -551,12 +550,16 @@ class Board:
                 return win_value, 1
             else:
                 specie_value = (self.__v - self.__w)/(self.__w + self.__v)
-                dist_value = (self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))) / ((self.__X + self.__Y)/2)
-                human_value = (self.__wh_min[0] - self.__vh_min[0])/ ((self.__X + self.__Y)/2)
+                dist_value = (self.__vw_min[0] *
+                              self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
+                              ) / ((self.__X + self.__Y)/2)
+                human_value = (self.__wh_min[0] - self.__vh_min[0]) / ((self.__X + self.__Y)/2)
             
-        #print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
-        output_value = specie_value*alpha_specie + dist_value*alpha_dist + (0 if isnan(human_value) else human_value)*alpha_human
-        #print("output_value: {}".format(output_value))
+        # print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
+        output_value = specie_value*alpha_specie + dist_value*alpha_dist + alpha_human*(0
+                                                                                        if isnan(human_value)
+                                                                                        else human_value)
+        # print("output_value: {}".format(output_value))
         return output_value, 0
     # END heuristic
 
@@ -575,7 +578,9 @@ class Board:
                 specie_value = (self.__w - self.__v)/(self.__w + self.__v)
 
                 # if the ratio is > 1, we want to minimze the distance
-                dist_value = self.__vw_min[0] * self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size)) / ((self.__X + self.__Y)/2)
+                dist_value = (self.__vw_min[0] *
+                              self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
+                              ) / ((self.__X + self.__Y)/2)
 
                 # we want to maximize our voronoi cells over the other specie
                 voronoi_v = self.voronoi_value('v')
@@ -589,13 +594,17 @@ class Board:
                 return win_value, 1
             else:
                 specie_value = (self.__v - self.__w)/(self.__w + self.__v)
-                dist_value = (self.__vw_min[0] * self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))) / ((self.__X + self.__Y)/2)
+                dist_value = (self.__vw_min[0] *
+                              self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
+                              ) / ((self.__X + self.__Y)/2)
                 voronoi_v = self.voronoi_value('v')
                 voronoi_w = self.voronoi_value('w')
                 human_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
             
-        #print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
-        output_value = specie_value*alpha_specie + dist_value*alpha_dist + (0 if isnan(human_value) else human_value)*alpha_human
-        #print("output_value: {}".format(output_value))
+        # print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
+        output_value = specie_value*alpha_specie + dist_value*alpha_dist + alpha_human*(0
+                                                                                        if isnan(human_value)
+                                                                                        else human_value)
+        # print("output_value: {}".format(output_value))
         return output_value, 0
     # END heuristic_voronoi
