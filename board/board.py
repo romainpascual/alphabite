@@ -431,13 +431,13 @@ class Board:
         for v_cell in self.v_cells:
             dist = human_cell.dist_to(v_cell)
             if dist < d:
-                dist, species, cells = d, 'v', set(v_cell)
+                dist, species, cells = d, 'v', {v_cell}
             elif dist == d:
                 cells.add(v_cell)
         for w_cell in self.w_cells:
             dist = human_cell.dist_to(w_cell)
             if dist < d:
-                dist, species, cells = d, 'w', set(w_cell)
+                dist, species, cells = d, 'w', {w_cell}
             elif dist == d:
                 if species == 'v':
                     species = None
@@ -452,7 +452,7 @@ class Board:
             for h_cell, voronoi_value in self.__voronoi.items():
                 d = h_cell.dist_to(cell)
                 if voronoi_value[0] > d:
-                    self.__voronoi[h_cell] = (d, cell.species, set(cell))
+                    self.__voronoi[h_cell] = (d, cell.species, {cell})
                 elif voronoi_value[0] == d:
                     species = voronoi_value[1]
                     if voronoi_value[1] != cell.species:
