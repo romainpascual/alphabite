@@ -329,7 +329,7 @@ class Board:
 
         # handle empty cell list
         if len(source_cells) == 0:
-            return inf, None
+            return (inf, None, None)
 
         min_dist = inf
         s = None
@@ -338,7 +338,7 @@ class Board:
                 d, t_cell = self.min_distance_from_to(s_cell, target_species)
                 if d < min_dist:
                     min_dist, s, t = d, s_cell, t_cell
-        return min_dist, s, t
+        return (min_dist, s, t)
     # END min_distance_species
 
     def delete_cell_update_dist(self, cell):
