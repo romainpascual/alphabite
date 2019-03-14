@@ -222,9 +222,6 @@ class Board:
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
-        #print(self)
-        #print(len(self.h_cells), len(self.v_cells), len(self.w_cells))
-        self.heuristic_voronoi('w')
     # END update
 
     def update_cell(self, new_cell):
@@ -440,11 +437,6 @@ class Board:
                 if species == 'v':
                     species = None
                 cells.add(w_cell)
-        """
-        print(human_cell, d, species)
-        for c in cells:
-            print(c)
-        """
         return species
     # END closest_playing_cell
 
