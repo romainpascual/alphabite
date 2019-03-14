@@ -56,8 +56,6 @@ class Board:
         self.__wh_min = (inf, None, None)
         self.__vw_min = (inf, None, None)
 
-        self.__voronoi = dict()
-
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
@@ -83,7 +81,6 @@ class Board:
         other_board.__vh_min = self.__vh_min
         other_board.__wh_min = self.__wh_min
         other_board.__vw_min = self.__vw_min
-        other_board.__voronoi = self.__voronoi
 
         return other_board
     # END __copy__
@@ -245,8 +242,6 @@ class Board:
         elif old_cell.species == 'w':
             self.__w -= old_cell.group_size
             self.__w_cells.pop((x, y), None)
-        if Board.HEURISTIC_VORONOI:
-            self.delete_cell_upd_voronoi(old_cell)
         self.delete_cell_update_dist(old_cell)
         
         # process the new cell
@@ -259,8 +254,6 @@ class Board:
         elif new_cell.species == 'w':
             self.__w += new_cell.group_size
             self.__w_cells[(x, y)] = new_cell
-        if Board.HEURISTIC_VORONOI:
-            self.create_cell_upd_voronoi(new_cell)
         self.create_cell_update_dist(new_cell)
 
         self._cells[(x, y)] = new_cell
@@ -444,51 +437,15 @@ class Board:
                 if species == 'v':
                     species = None
                 cells.add(w_cell)
-        return (d, species, cells)
+        return species
     # END closest_playing_cell
 
-    def create_cell_upd_voronoi(self, cell):
-        if cell.species == 'h':
-            self.__voronoi[cell] = self.closest_specie(cell)
-        elif cell.species == 'v' or cell.species == 'w':
-            for h_cell, voronoi_value in self.__voronoi.items():
-                dist = h_cell.dist_to(cell)
-                if dist < voronoi_value[0]:
-                    self.__voronoi[h_cell] = (dist, cell.species, {cell})
-                elif dist == voronoi_value[0]:
-                    species = voronoi_value[1]
-                    if voronoi_value[1] != cell.species:
-                        species = None
-                    cells = copy(voronoi_value[2])
-                    cells.add(cell)
-                    self.__voronoi[h_cell] = (dist, species, cells)
-    # END create_cell_upd_voronoi
-
-    def delete_cell_upd_voronoi(self, cell):
-        if cell.species == 'h':
-            self.__voronoi.pop(cell, None)
-        elif cell.species == 'v' or cell.species == 'w':
-            for h_cell, voronoi_value in self.__voronoi.items():
-                if cell in voronoi_value[2]:
-                    if len(voronoi_value[2]) == 1:
-                        self.__voronoi[h_cell] = self.closest_specie(h_cell)
-                    elif len(voronoi_value[2]) > 1 :
-                        cells = copy(voronoi_value[2])
-                        cells.remove(cell)
-                        for c in cells:
-                            break
-                        species = c.species
-                        for c in cells:
-                            if species != c.species:
-                                species = None
-                        self.__voronoi[h_cell] = (voronoi_value[0], species, cells)           
-    # END delete_cell_upd_voronoi
-
-    def voronoi_value(self, species):
-        value = 0
-        for h_cell, voronoi_value in self.__voronoi.items():
-            if voronoi_value[1] is not None and voronoi_value[1] == species:
-                value += h_cell.group_size
+    def voronoi_value(self):
+        value = {'v':0, 'w':0}
+        for h_cell in self.h_cells:
+            species = self.closest_specie(h_cell)
+            if species is not None:
+                value[species] += h_cell.group_size
         return value
     # END voronoi_value
 
@@ -585,8 +542,9 @@ class Board:
                               ) / ((self.__X + self.__Y)/2)
 
                 # we want to maximize our voronoi cells over the other specie
-                voronoi_v = self.voronoi_value('v')
-                voronoi_w = self.voronoi_value('w')
+                voronoi = self.voronoi_value()
+                voronoi_v = voronoi['v']
+                voronoi_w = voronoi['w']
                 if voronoi_v == 0 and voronoi_w == 0:
                     human_value = 0
                 else:
@@ -602,8 +560,9 @@ class Board:
                 dist_value = (self.__vw_min[0] *
                               self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
                               ) / ((self.__X + self.__Y)/2)
-                voronoi_v = self.voronoi_value('v')
-                voronoi_w = self.voronoi_value('w')
+                voronoi = self.voronoi_value()
+                voronoi_v = voronoi['v']
+                voronoi_w = voronoi['w']
                 if voronoi_v == 0 and voronoi_w == 0:
                     human_value = 0
                 else:
