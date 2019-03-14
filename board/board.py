@@ -200,9 +200,15 @@ class Board:
         Return the cells of species as a list
         """
         if species == 'v':
-            return self.v_cells
+            if len(self.v_cells) <= 2:
+                return self.v_cells
+            else:
+                return sorted(self.v_cells, key=lambda cell: cell.group_size, reverse=True)[:2]
         elif species == 'w':
-            return self.w_cells
+            if len(self.w_cells) <= 2:
+                return self.w_cells
+            else:
+                return sorted(self.w_cells, key=lambda cell: cell.group_size, reverse=True)[:2]
     # END get_cells
 
     # ----------------------------------------------------------------------------
