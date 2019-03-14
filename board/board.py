@@ -549,6 +549,7 @@ class Board:
                     human_value = 0
                 else:
                     human_value = (voronoi_w - voronoi_v)/(voronoi_w + voronoi_v)
+                print(voronoi_v, voronoi_w)
         
         else:
             if self.__v == 0:
@@ -567,6 +568,7 @@ class Board:
                     human_value = 0
                 else:
                     human_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
+                print(voronoi_v, voronoi_w)
             
         # print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
         output_value = specie_value*alpha_specie + dist_value*alpha_dist + alpha_human*(0
