@@ -546,7 +546,7 @@ class Board:
                 dist_value = (self.__vw_min[0] *
                               self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
                               ) / ((self.__X + self.__Y)/2)
-                human_value = (self.__wh_min[0] - self.__vh_min[0]) / ((self.__X + self.__Y)/2)
+                human_value = (self.__vh_min[0] - self.__wh_min[0]) / ((self.__X + self.__Y)/2)
                 # we want to maximize our voronoi cells over the other specie
                 voronoi = self.voronoi_value()
                 voronoi_v = voronoi['v']
@@ -585,7 +585,7 @@ class Board:
         return output_value, 0
     # END heuristic_voronoi
 
-    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4, alpha_voronoi=4):
+    def heuristic(self, species, win_value=-100, lose_value=-50, alpha_specie=22, alpha_dist=1, alpha_human=5, alpha_voronoi=5):
         if Board.HEURISTIC_VORONOI:
             return self.heuristic_voronoi(species, win_value, lose_value, alpha_specie, alpha_dist, alpha_human, alpha_voronoi)
         else:
