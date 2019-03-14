@@ -222,6 +222,9 @@ class Board:
         # -- Errors
         self.__err_code = Board.SUCCESS
         self.__err_msg = ""
+        #print(self)
+        #print(len(self.h_cells), len(self.v_cells), len(self.w_cells))
+        self.heuristic_voronoi('w')
     # END update
 
     def update_cell(self, new_cell):
@@ -437,6 +440,11 @@ class Board:
                 if species == 'v':
                     species = None
                 cells.add(w_cell)
+        """
+        print(human_cell, d, species)
+        for c in cells:
+            print(c)
+        """
         return species
     # END closest_playing_cell
 
@@ -522,7 +530,7 @@ class Board:
         return output_value, 0
     # END heuristic_distance
 
-    def heuristic_voronoi(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
+    def heuristic_voronoi(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4, alpha_voronoi=4):
         """
         Return the heuristic value of the board, assuming max player is playing species
         """
@@ -540,16 +548,16 @@ class Board:
                 dist_value = (self.__vw_min[0] *
                               self.f(float(self.__vw_min[2].group_size)/float(self.__vw_min[1].group_size))
                               ) / ((self.__X + self.__Y)/2)
-
+                human_value = (self.__wh_min[0] - self.__vh_min[0]) / ((self.__X + self.__Y)/2)
                 # we want to maximize our voronoi cells over the other specie
                 voronoi = self.voronoi_value()
                 voronoi_v = voronoi['v']
                 voronoi_w = voronoi['w']
                 if voronoi_v == 0 and voronoi_w == 0:
-                    human_value = 0
+                    voronoi_value = 0
                 else:
-                    human_value = (voronoi_w - voronoi_v)/(voronoi_w + voronoi_v)
-                print(voronoi_v, voronoi_w)
+                    voronoi_value = (voronoi_w - voronoi_v)/(voronoi_w + voronoi_v)
+                #print(voronoi_v, voronoi_w)
         
         else:
             if self.__v == 0:
@@ -561,25 +569,26 @@ class Board:
                 dist_value = (self.__vw_min[0] *
                               self.f(float(self.__vw_min[1].group_size)/float(self.__vw_min[2].group_size))
                               ) / ((self.__X + self.__Y)/2)
+                human_value = (self.__wh_min[0] - self.__vh_min[0]) / ((self.__X + self.__Y)/2)
                 voronoi = self.voronoi_value()
                 voronoi_v = voronoi['v']
                 voronoi_w = voronoi['w']
                 if voronoi_v == 0 and voronoi_w == 0:
-                    human_value = 0
+                    voronoi_value = 0
                 else:
-                    human_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
-                print(voronoi_v, voronoi_w)
-            
+                    voronoi_value = (voronoi_v - voronoi_w)/(voronoi_w + voronoi_v)
+                #print(voronoi_v, voronoi_w)
+        
+        if isnan(human_value):
+            human_value = 0
         # print("specie_value: {} -- dist_value: {} -- human_value: {}".format(specie_value, dist_value, human_value))
-        output_value = specie_value*alpha_specie + dist_value*alpha_dist + alpha_human*(0
-                                                                                        if isnan(human_value)
-                                                                                        else human_value)
+        output_value = specie_value*alpha_specie + dist_value*alpha_dist + alpha_human*human_value + alpha_voronoi*voronoi_value
         # print("output_value: {}".format(output_value))
         return output_value, 0
     # END heuristic_voronoi
 
-    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4):
+    def heuristic(self, species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4, alpha_voronoi=4):
         if Board.HEURISTIC_VORONOI:
-            return self.heuristic_voronoi(species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4)
+            return self.heuristic_voronoi(species, win_value, lose_value, alpha_specie, alpha_dist, alpha_human, alpha_voronoi)
         else:
-            return self.heuristic_distance(species, win_value=50, lose_value=-100, alpha_specie=10, alpha_dist=1, alpha_human=4)
+            return self.heuristic_distance(species, win_value, lose_value, alpha_specie, alpha_dist, alpha_human)
