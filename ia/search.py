@@ -27,6 +27,8 @@ class IA(Thread):
 
         self.event = None  # TODO: better event handling to allow for calculation during opponent turn
 
+        self.__timeout_count = 0
+
     def set_species(self, species):
         self.__my_species = species
         self.__enemy_species = 'v' if self.__my_species == 'w' else 'w'
@@ -171,6 +173,9 @@ class IA(Thread):
         self.__send_mov([self.__best_move.parse_for_socket()])
         self.__hasTimedOut = True
         self.__best_move = None
+        self.__timeout_count += 1
+        if self.__timeout_count % 3 == 0:
+            self.__max_depth -= 1
 
     def run(self):
         while self.__shouldRun:
