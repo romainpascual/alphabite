@@ -37,10 +37,10 @@ class BoardGenerator:
                 # The dest cell contains humans not numerous to survive
                 # It looks as if it was initially filled with our guys
                 return self.get_simple_move_board(src_cell, dest_cell, moving_group_size)
-            else:
-                # The dest cell contains humans and they are numerous
-                # A random battle happens
-                return self.get_all_random_battle_boards(src_cell, dest_cell, moving_group_size)
+            # else:
+            #     # The dest cell contains humans and they are numerous
+            #     # A random battle happens
+            #     return self.get_all_random_battle_boards(src_cell, dest_cell, moving_group_size)
 
         if src_cell.species != dest_cell.species:
             if moving_group_size >= 1.5 * dest_cell.group_size:
