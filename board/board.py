@@ -585,7 +585,7 @@ class Board:
         return output_value, 0
     # END heuristic_voronoi
 
-    def heuristic(self, species, win_value=80, lose_value=-140, alpha_specie=22, alpha_dist=1, alpha_human=5, alpha_voronoi=5):
+    def heuristic(self, species, win_value=45, lose_value=-140, alpha_specie=20, alpha_dist=1, alpha_human=5, alpha_voronoi=5):
         if Board.HEURISTIC_VORONOI:
             return self.heuristic_voronoi(species, win_value, lose_value, alpha_specie, alpha_dist, alpha_human, alpha_voronoi)
         else:
